@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <integration.tomcat.url>http://localhost:8080/manager/text</integration.tomcat.url>
+    </properties>
+
+    <packaging>war</packaging>
+
+    <groupId>groupId</groupId>
+    <artifactId>project</artifactId>
+    <version>1.0</version>
+
+    <build>
+
+
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webXml>src/main/project/WEB-INF/web.xml</webXml>
+                    <webResources>
+                        <resource>
+                            <!-- this is relative to the pom.xml directory -->
+                            <directory>resources</directory>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+
+
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>tomcat-maven-plugin</artifactId>-->
+                <!--<version>1.0-SNAPSHOT</version>-->
+            <!--</plugin>-->
+
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat8-maven-plugin</artifactId>
+                <version>3.0-r1655215</version>
+                <configuration>
+                    <server>tomcat-server</server>
+                    <url>http://localhost:8080/manager/text</url>
+                    <path>/</path>
+                    <warFile>target/${project.artifactId}-${project.version}.${project.packaging}</warFile>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+
+
+
+    </build>
+
+
+    <repositories>
+
+        <repository>
+            <id>people.apache.snapshots</id>
+            <url>http://repository.apache.org/content/groups/snapshots-group/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <!--<pluginRepositories>-->
+        <!--<pluginRepository>-->
+            <!--<id>apache.snapshots</id>-->
+            <!--<name>Apache Snapshots</name>-->
+            <!--<url>http://repository.apache.org/content/groups/snapshots-group/</url>-->
+            <!--<releases>-->
+                <!--<enabled>false</enabled>-->
+            <!--</releases>-->
+            <!--<snapshots>-->
+                <!--<enabled>true</enabled>-->
+            <!--</snapshots>-->
+        <!--</pluginRepository>-->
+    <!--</pluginRepositories>-->
+
+    <!--Норм вроде-->
+    <!--<pluginRepositories>-->
+        <!--<pluginRepository>-->
+            <!--<id>Codehaus Snapshots</id>-->
+            <!--<url>http://snapshots.repository.codehaus.org/</url>-->
+            <!--<snapshots>-->
+                <!--<enabled>true</enabled>-->
+            <!--</snapshots>-->
+            <!--<releases>-->
+                <!--<enabled>true</enabled>  &lt;!&ndash; Workaround for MNG-2974, see note below &ndash;&gt;-->
+            <!--</releases>-->
+        <!--</pluginRepository>-->
+    <!--</pluginRepositories>-->
+
+
+<pluginRepositories>
+        <pluginRepository>
+            <id>tomcat8-maven-plugin</id>
+            <url>https://artifacts.alfresco.com/nexus/content/groups/public/</url>
+        </pluginRepository>
+</pluginRepositories>
+
+<dependencies>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901-1.jdbc4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.2.1-b03</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+
+
+</project>

@@ -1,18 +1,16 @@
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 
 
@@ -41,7 +39,7 @@ public class Servlet extends HttpServlet {
         Date dateNow = new Date();
         pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br><br>");
 
-        pageBody.append("<form action=\"" + ACTION_URL + "\">");
+        pageBody.append("<getFormAuthorization action=\"" + ACTION_URL + "\">");
         pageBody.append(new SimpleDateFormat("HH:mm:ss").format(dateNow)).append(
                 "<br>" + new SimpleDateFormat("dd-MM-yyyy").format(dateNow) + "<br><br>");
 
@@ -67,15 +65,7 @@ public class Servlet extends HttpServlet {
             jdbcPostgres db = new jdbcPostgres();
             ResultSet rs;
             int column = 0;
-            String row = null;
-            try {
-                rs = db.execute("SELECT * FROM cooks");
-                column = rs.getMetaData().getColumnCount();
-            } catch (SQLException e) {
-                row = e.toString();
-            }
 
-            pageBody.append("Postgres ('SELECT * FROM cooks')<br>COLUMNS: " + column + ".<br>ROW: " + row + "<br>");
 
 
         } else {
@@ -88,9 +78,8 @@ public class Servlet extends HttpServlet {
                                         (request.getParameter("login") == null || request.getParameter("password") == null)
                         )
                         ) {
-                    pageBody.append("<br>UPPER-UPPER-UPPER-UPPER-UPPER<br>");
-                    pageBody.append("<input type=\"text\" name=\"\" value=\"Login\"><br>");
-                    pageBody.append("<input type=\"password\" name=\"\" value=\"Password\"><br>");
+                    pageBody.append("<input type=\"text\" name=\"login\" value=\"Login\"><br>");
+                    pageBody.append("<input type=\"password\" name=\"password\" value=\"Password\"><br>");
                     pageBody.append("<input type=\"submit\" value=\"Login\">");
                 } else {
                     LOGIN_ENTERED = request.getParameter("login");
@@ -151,8 +140,8 @@ public class Servlet extends HttpServlet {
                 "<br> -----------------------------------"
         );
         pageBody.append("validCookie(request): " + validCookie(request));
+        pageBody.append("<br> HashMe.getMD5(\"test\"): " + getMD5("test") + "</getFormAuthorization>");
         response.getWriter().println(pageBody);
-        pageBody.append("<br> HashMe.getMD5(\"test\"): " + getMD5("test") + "</form>");
     }
 
     private String cookieToString(Cookie[] coo) {
@@ -205,14 +194,14 @@ public class Servlet extends HttpServlet {
         // psql insert
     }
 
-    // For authorized users
+    // For enterSuccess users
     private void pageAuthorized(HttpServletRequest request) {
         StringBuilder pageBody = null;
         String ACTION_URL = "http://" + request.getLocalAddr() + ":8080/ignis/test";
         Date dateNow = new Date();
         String date = new SimpleDateFormat("dd-MM-yyyy").format(dateNow);
         String time = new SimpleDateFormat("HH:mm:ss").format(dateNow);
-        pageBody.append("<form action=\"" + ACTION_URL + "\">");
+        pageBody.append("<getFormAuthorization action=\"" + ACTION_URL + "\">");
         pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br>");
         pageBody.append("<br>");
         pageBody.append(time).append("<br>" + date + "<br><br>");
@@ -236,7 +225,7 @@ public class Servlet extends HttpServlet {
 //        if (validCookie(request)) {//если Кука есть, незаэкспайреная
 //            HASHMAP.put(COOKIE_CURRENT_STR, TIME_NOW_MINUTE);
 //
-//            try {Thread.sleep(1000);
+//            try {Thread.sleepTime(1000);
 //            } catch (InterruptedException e) {
 //                e.printStackTrace(); }
 //
@@ -302,8 +291,8 @@ public class Servlet extends HttpServlet {
 
                 /*
         // Cookies add
-        Cookie name = new Cookie("name", "nameTest"); //URLEncoder.encode(req.getParameter("name"), "UTF-8"));
-        Cookie url = new Cookie("url", ACTION_URL);
+        Cookies name = new Cookies("name", "nameTest"); //URLEncoder.encode(req.getParameter("name"), "UTF-8"));
+        Cookies url = new Cookies("url", ACTION_URL);
         name.setMaxAge(60*60*24); //
         url.setMaxAge(60*60*24);
         response.addCookie(name);
