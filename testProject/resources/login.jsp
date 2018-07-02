@@ -116,7 +116,7 @@
   <div class="login-page">
     <div class="form">
 
-      <form action="http://localhost:8080/project/s">
+      <form action="/project">
         <input  type="text"     name="login"    placeholder="login" /><br>
         <input  type="password" name="password" placeholder="password" /><br>
         <button type="submit"   style="border-radius: 3px;">Login</button>

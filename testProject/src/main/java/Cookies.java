@@ -1,4 +1,5 @@
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.Date;
@@ -21,44 +22,66 @@ class Cookies {
 
 //    static ConcurrentHashMap<String, Long> zzz = new ConcurrentHashMap<>(1024);
 
-    static jdbcPostgres psql;
+    private static jdbcPostgres psql = new jdbcPostgres();
 
     static {
         //jdbc кеширование в HM кук(Str) и времени(Str) БД, таблицы cooks
-        psql = new jdbcPostgres();
         try {
             ResultSet rsData = psql.execute("SELECT * FROM cooks");
 
             while (rsData.next()) {
                 String cook = rsData.getString(1);
                 long time = Long.parseLong(rsData.getString(2));
-                // out.println(cook + ": " + time);
                 hmCookieTime.put(cook, time);
             }
 
-
-            // старатунь thread
+            //TODO:  стартануть thread10Min
 
         } catch (Exception e) {
             e.printStackTrace(); // log + стопануть
-        } finally {
-            psql.closeConnection();
         }
+//         finally {
+//            psql.closeConnection();
+//        }
     }
+
 
     static Cookie getNewCookie() {
         String cookHashMD5 = Hash.getMD5(String.valueOf(new Date()));
-        return new Cookie("cook", cookHashMD5);
+        return new Cookie("cookAuth", cookHashMD5);
     }
 
-    static void saveCookie(Cookie cook) {
-        hmCookieTime.put(cook.getValue(), getTimeNow()); //put("DKVBJ3JH2B4JH24JB", "1529225995842")
+    // сохранить куку (если нет) в HM и PSQL
+    static void saveCookie(String cookie) {
+        long timeNow = getTimeNow();
+
+        hmCookieTime.put(cookie, timeNow); //put("DKVBJ3JH2B4JH24JB", "1529225995842")
+        String insertQuery = "INSERT INTO cooks(cookie, time) VALUES ('"+cookie+"', '"+timeNow+"')" +
+                " ON CONFLICT (cookie) DO UPDATE SET time = '"+timeNow+"'";
+
+        psql.execute(insertQuery);
     }
 
-    // проверка, есть ли кука в HM
-    static boolean isAliveCookie(Cookie cook) {
-        return hmCookieTime.get(cook.getValue()) != null;
+    static boolean isValidCookie(HttpServletRequest request){
+        boolean result=false;
+        Cookie[] cookArr = request.getCookies();
+        if (cookArr != null) {
+            for (Cookie cook : cookArr) {
+//                PAGE.append("Found: "+cook.getName()+"="+cook.getValue()+"<br>");
+                if (cook.getName().equals("authCook") & Cookies.hmCookieTime.containsKey(cook.getValue())) { //кука authCook есть в req & есть в HM
+                    result = hmCookieTime.containsKey(cook.getValue());
+                    break;
+                }
+            }
+        }
+        return result;
     }
+
+    // проверка куки
+//    static boolean CookieIsAlive(HttpServletRequest request) {
+//        request.getCookies();
+//        return hmCookieTime.get(cook.getValue()) != null;
+//    }
 
     private static float diffSeconds(long from, long to) {
         return (to - from) / 1000;

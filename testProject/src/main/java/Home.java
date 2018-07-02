@@ -34,7 +34,7 @@ public class Home extends HttpServlet {
         } else
             title = "Добро пожаловать, " + COOKIE_ARR[0].getValue();
 
-        PAGE.append("Postgres, table cooks: "+Cookies.hmCookieTime.keySet()+"<br>");
+        PAGE.append("Postgres, table cooks: "+ Cookies.hmCookieTime.keySet()+"<br>");
 
 
         String body =

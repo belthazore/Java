@@ -38,7 +38,7 @@ public class Registration  extends HttpServlet {
 
         String reg =
             "<form action=\"" + CURRENT_URL + "\">" +
-            "Login..........  <input type=\"text\" name=\"login\"    value=\"" + login + "\"><br>" +
+            "LoginOld..........  <input type=\"text\" name=\"login\"    value=\"" + login + "\"><br>" +
             "Password.... <input     type=\"text\" name=\"password\" value=\"" + password + "\"><br>" +
             "Email..........  <input type=\"text\" name=\"email\" value=\"" + email + "\"><br>" +
             "<br>-------------  <input type=\"submit\" value=\"Register\"> -------------</form><br><br>";

@@ -78,9 +78,9 @@ public class Servlet extends HttpServlet {
                                         (request.getParameter("login") == null || request.getParameter("password") == null)
                         )
                         ) {
-                    pageBody.append("<input type=\"text\" name=\"login\" value=\"Login\"><br>");
+                    pageBody.append("<input type=\"text\" name=\"login\" value=\"LoginOld\"><br>");
                     pageBody.append("<input type=\"password\" name=\"password\" value=\"Password\"><br>");
-                    pageBody.append("<input type=\"submit\" value=\"Login\">");
+                    pageBody.append("<input type=\"submit\" value=\"LoginOld\">");
                 } else {
                     LOGIN_ENTERED = request.getParameter("login");
                     PASSWORD_ENTERED = request.getParameter("password");
@@ -102,15 +102,15 @@ public class Servlet extends HttpServlet {
                 }
             } catch (NullPointerException e) { // не удалось выполнить request.getParameter("login").isEmpty()
                 pageBody.append("Exception when try check login&password:<br>" + e.toString() + "<br><br>");
-                pageBody.append("<input type=\"text\" name=\"login\" value=\"Login\"><br>");
+                pageBody.append("<input type=\"text\" name=\"login\" value=\"LoginOld\"><br>");
                 pageBody.append("<input type=\"password\" name=\"password\" value=\"Password\"><br>");
-                pageBody.append("<input type=\"submit\" value=\"Login\">");
+                pageBody.append("<input type=\"submit\" value=\"LoginOld\">");
             }
         }
 
 
         pageBody.append("<br><br>" +
-                "<br> <b>Cookies income</b>" +
+                "<br> <b>AuthorizationChecker income</b>" +
                 "<br> -----------------------------------" +
                 "<br>" + cookieToString(COOKIE_ARR) +
                 "<br> -----------------------------------"
@@ -290,9 +290,9 @@ public class Servlet extends HttpServlet {
 
 
                 /*
-        // Cookies add
-        Cookies name = new Cookies("name", "nameTest"); //URLEncoder.encode(req.getParameter("name"), "UTF-8"));
-        Cookies url = new Cookies("url", ACTION_URL);
+        // AuthorizationChecker add
+        AuthorizationChecker name = new AuthorizationChecker("name", "nameTest"); //URLEncoder.encode(req.getParameter("name"), "UTF-8"));
+        AuthorizationChecker url = new AuthorizationChecker("url", ACTION_URL);
         name.setMaxAge(60*60*24); //
         url.setMaxAge(60*60*24);
         response.addCookie(name);

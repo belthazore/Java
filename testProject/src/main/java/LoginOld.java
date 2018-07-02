@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 
 
-public class Login extends HttpServlet {
+public class LoginOld extends HttpServlet {
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -18,10 +18,10 @@ public class Login extends HttpServlet {
 
         StringBuilder PAGE = new StringBuilder();
         String CURRENT_URL = request.getRequestURL().toString();  // Урл, по которому был переход
-        String HOME_PAGE = "http://localhost:8080/project/home"; //TODO:
+        String HOME_PAGE = "http://localhost:8080/project/home";  //TODO:
 
         if (request.getCookies()!=null)
-//            if (Cookies.hmCookieTime.get(COOKIE_ARR[0].getValue())!=null)
+//            if (AuthorizationChecker.hmCookieTime.get(COOKIE_ARR[0].getValue())!=null)
             response.sendRedirect(HOME_PAGE); //есть кука в БД, переводим на страницу /home
 
         // Page
@@ -38,9 +38,9 @@ public class Login extends HttpServlet {
 
         String reg =
             "<form action=\"" + CURRENT_URL + "\">" +
-            "Login..........  <input type=\"text\" name=\"login\"    value=\"" + enteredLogin + "\"><br>" +
+            "LoginOld..........  <input type=\"text\" name=\"login\"    value=\"" + enteredLogin + "\"><br>" +
             "Password.... <input     type=\"text\" name=\"password\" value=\"" + enteredPassword + "\"><br>" +
-            "<br>-------------  <input type=\"submit\" value=\"Login\"> -------------</form><br><br>";
+            "<br>-------------  <input type=\"submit\" value=\"LoginOld\"> -------------</form><br><br>";
 
         PAGE.append(reg);
 
@@ -57,17 +57,17 @@ public class Login extends HttpServlet {
                 rs.next();
                 rs.getString(1); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
                 Cookie cook = Cookies.getNewCookie();
-                Cookies.saveCookie(cook); //TODO: Сохраним в PG нашу новую куку
+                Cookies.saveCookie(cook.getValue()); //TODO: Сохраним в PG нашу новую куку
                 response.addCookie(cook);
                 loginSuccess = true;
             }catch (Exception e){
-                errMessage = "Login or password wrong<br>(Exception: " + e.getMessage()+")<br>";
+                errMessage = "LoginOld or password wrong<br>(Exception: " + e.getMessage()+")<br>";
             }
             finally {
                 psql.closeConnection();
             }
         }
-        PAGE.append("<br>DBG: <br>"+Cookies.hmCookieTime.keySet()+"<br>");
+        PAGE.append("<br>DBG: <br>"+ Cookies.hmCookieTime.keySet()+"<br>");
 
         if (loginSuccess) {
             response.sendRedirect(HOME_PAGE);
