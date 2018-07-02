@@ -59,8 +59,8 @@
                 <configuration>
                     <server>tomcat-server</server>
                     <url>http://localhost:8080/manager/text</url>
-                    <path>/</path>
                     <warFile>target/${project.artifactId}-${project.version}.${project.packaging}</warFile>
+                    <!-- <warFile>target/project-1.0.war</warFile> -->
                 </configuration>
             </plugin>
 
