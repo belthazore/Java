@@ -131,6 +131,12 @@ public class Main {
 //            out.println("Remove present pair: " + hm.remove("key"));
 //            out.println("Remove nothing: " + hm.remove("key"));
 
+
+
+
+
+
+
             //Тест удаления из PSQL
             out.println("\n ____ Тест удаления из PSQL ____");
 
@@ -139,6 +145,8 @@ public class Main {
                     "('cook_test2', '1529658000002')," +
                     "('cook_test3', '1529658000003')";
 
+
+
             // TODO: готово
             // 01. Добавить запись, если уже есть - обновить
             // (Обновление времени куки, если клиент зашел)
@@ -146,16 +154,23 @@ public class Main {
                     " ON CONFLICT (cookie) DO UPDATE SET time =  '1529658000001'";
 //            out.println(QUERY_INSERT_ONE + ":\n" + psql.execute(QUERY_INSERT_ONE));
 
+
+
             // 02. поиск (ХЗ)
             String QUERY_SELECT_ONE = "SELECT * FROM cooks WHERE cookie='cook_test'";
             ResultSet rsSelectOne = psql.execute(QUERY_SELECT_ONE);
 //            out.println(QUERY_SELECT_ONE + ":\n" + psql.getRowCount(rsSelectOne));
 
 
+
             // 03. Удаление
             String QUERY_RM_ONE = "DELETE FROM cooks WHERE cookie='cook_test777'";
             psql.execute(QUERY_RM_ONE); // "Запрос не вернул результата"
             out.println("\n" + QUERY_RM_ONE + ":\n" + "");
+
+
+
+
 
 
 

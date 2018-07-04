@@ -14,7 +14,7 @@ import java.util.Map;
 
 
 
-public class Servlet extends HttpServlet {
+public class Dbg extends HttpServlet {
     private static Map <String, Long> HASHMAP = new HashMap<String, Long>();
     private Cookie[] COOKIE_ARR;
     private long TIME_NOW_MINUTE = (System.currentTimeMillis()/1000)/60;
