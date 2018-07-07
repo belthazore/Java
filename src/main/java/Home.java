@@ -39,30 +39,39 @@ public class Home extends HttpServlet {
                 "</head>";
 
 
-        String find_history = "",create_history = "";
+//        product=Tortilla&phone_number=0671234567&action=create
+
+        String action, orderId, product, phoneNumber; // проверенные параметры (!"" | "")
+        String actionNeedCheck, orderIdNeedCheck, productNeedCheck, phoneNumberNeedCheck; // параметры для проверки, могут быть == null
+
+
+        actionNeedCheck = request.getParameter("action");
+        orderIdNeedCheck = request.getParameter("order_id");
+
+        productNeedCheck = request.getParameter("product");
+        phoneNumberNeedCheck = request.getParameter("phone_number");
 
         // если так не делать, то в кейсе 'action==null' блок
         // 'if ( action!=null & (action.equals("find") | action.equals("create") ){}'
         // дает NullPointerException =(
-        String actionNeedCheck = request.getParameter("action");
-        String orderIdNeedCheck = request.getParameter("order_id");
-        String action = ( actionNeedCheck==null ? "" : actionNeedCheck);
-        String orderId = ( orderIdNeedCheck==null ? "" : orderIdNeedCheck);
+        action = ( actionNeedCheck==null ? "" : actionNeedCheck);
+        orderId = ( orderIdNeedCheck==null ? "" : orderIdNeedCheck);
+
+        product = ( productNeedCheck==null ? "" : productNeedCheck);
+        phoneNumber = ( phoneNumberNeedCheck==null ? "" : phoneNumberNeedCheck);
 
 
 
-
-
-
-
+        // выполнение действий и сохранение их результатов в историю HashMap
+        // TODO: сохранять по логину пользователя историю индивидуально
         if (action.equals("find") | action.equals("create")){
-                String actionResult = doAction(action, orderId);
+            String actionResult = doAction(action, (action.equals("find") ? new String[]{orderId} : new String[]{product, phoneNumber}));
                 if (actionResult != null) {
                     try {
-                        SEARCH_RESULTS.get(action).add(getDateTimeNow() + " " + actionResult); // добавим результат запроса в историю
-                    }catch (NullPointerException e){ //еще нет такого ключа 'action'
+                        SEARCH_RESULTS.get(action).add("["+getDateTimeNow() + "]   " + actionResult); // добавим результат запроса в историю
+                    }catch (NullPointerException e){ //еще нет такого ключа 'action', тогда добавим в HM запись впервые. Прим. '"find", ArrayList<S> {"07-07-2018 14:47:39 4 | Macaroni: 45 pcs | 0671234567"}'
                         ArrayList <String> tempArrList = new ArrayList<>();
-                        tempArrList.add(getDateTimeNow() + " " + actionResult);
+                        tempArrList.add("["+getDateTimeNow() + "]   " + actionResult);
                         SEARCH_RESULTS.put(action, tempArrList);
                     }
 
@@ -84,25 +93,26 @@ public class Home extends HttpServlet {
         String body =
                 "<body>" +
                         "  <div class=\"login-page\">" +
-                        "    <div class=\"form\" >" +
+                        "    <div class=\"form\"  float=\"left\">" +
                         "        <b>Find order</b>" +
                         "        <form action=\"/project/home\" style=\"width: 300px;margin: auto;\">" +
                         "            <br><br>" +
                         "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
                         "            <br><br>" +
-                        "<input name=\"action\" value=\"find\" type=\"hidden\">" +
+                        "         <input name=\"action\" value=\"find\" type=\"hidden\">" +
                         "            <button type=\"submit\" style=\"border-radius: 3px;\">Find</button>" +
                         "        </form>" +
                         getHistoryByAction("find") +
                         "    </div>" +
-                        "    <div class=\"form\">" +
+                        "    <div class=\"form\" float=\"right\">" +
                         "        <b>Create Order</b>" +
                         "        <form action=\"/project/home\" style=\"width: 300px;margin: auto;\">" +
                         "            <br><br>" +
-                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
+//                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
                         "            <input name=\"product\" placeholder=\"product\" type=\"text\">" +
                         "            <input name=\"phone_number\" placeholder=\"client phone\" type=\"text\">" +
                         "            <br><br>" +
+                        "         <input name=\"action\" value=\"create\" type=\"hidden\">" +
                         "            <button type=\"submit\" style=\"border-radius: 3px;\">Create</button>" +
                         "        </form>" +
                         getHistoryByAction("create") +
@@ -122,7 +132,10 @@ public class Home extends HttpServlet {
     private String getHistoryByAction(String action){
         ArrayList<String> arrayListSearchResults = SEARCH_RESULTS.get(action);
         if (arrayListSearchResults!=null){
-            String buffer="<br><br><br><b>History</b><br>-----------------------------------------------------------------<br><br>";
+            String buffer =
+                    "<br><br><br>" +
+                    "<b>History</b>" +
+                    "<br>-----------------------------------------------------------------<br><br>";
             for(Object o : arrayListSearchResults.toArray()){
                 buffer+=o+"<br><br>";
             }
@@ -131,7 +144,10 @@ public class Home extends HttpServlet {
             return "";
     }
 
-    private String doAction(String action, String orderId){
+    private String doAction(String action, String[] params){
+        // params[] в зависимости от action
+        // find:   ["1"]
+        // create: ["Merenga: 10 pcs", "0671234567"]
         String result = null;
         jdbcPostgres psql = null;
         try {
@@ -139,12 +155,20 @@ public class Home extends HttpServlet {
 
             switch (action) {
                 case "find":
-                    ResultSet rs = psql.execute("SELECT * FROM orders WHERE order_id='" + orderId + "'");
+                    ResultSet rs = psql.execute("SELECT * FROM orders WHERE order_id='" + params[0] + "'");
                     rs.next();
                     result = rs.getString("order_id") +" | "+ rs.getString("product") +" | "+ rs.getString("client_phone");
                     break;
                 case "create":
-                    result = "test empty";
+                    String QueryInsert =
+                        "INSERT INTO orders" +
+                        "  (order_id, product, client_phone)" +
+                        "VALUES" +
+                        "  (nextval('orders_order_id_seq'), '" + params[0] + "', '" + params[1] + "')";
+                    psql.execute(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
+                    ResultSet rs2 = psql.execute("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
+                    rs2.next();
+                    result = rs2.getString(1) + " | " + params[0] + " | " + params[1];
                     break;
                 default:
                     throw new Exception("Wrong action");
