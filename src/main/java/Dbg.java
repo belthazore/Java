@@ -15,7 +15,10 @@ import java.util.Map;
 
 
 public class Dbg extends HttpServlet {
+
     private static Map <String, Long> HASHMAP = new HashMap<String, Long>();
+    private static Map <String, String> hmResult = new HashMap<String, String>(); //ключ= модуль страницы, прим. 'MD5', значение=String с '<br>' тэгами
+
     private Cookie[] COOKIE_ARR;
     private long TIME_NOW_MINUTE = (System.currentTimeMillis()/1000)/60;
     private String COOKIE_CURRENT_STR;
@@ -32,16 +35,19 @@ public class Dbg extends HttpServlet {
         COOKIE_CURRENT_STR = getCookieStr();
 
         StringBuilder pageBody = new StringBuilder();
-        ACTION_URL = "http://" + request.getLocalAddr() + ":8080/ignis/test";
+        ACTION_URL = String.valueOf(request.getRequestURL());
         CONTENT_TYPE = "text/html;charset=utf-8";
         response.setContentType(CONTENT_TYPE);
 
-        Date dateNow = new Date();
         pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br><br>");
 
+        Date dateNow = new Date();
         pageBody.append("<getFormAuthorization action=\"" + ACTION_URL + "\">");
         pageBody.append(new SimpleDateFormat("HH:mm:ss").format(dateNow)).append(
                 "<br>" + new SimpleDateFormat("dd-MM-yyyy").format(dateNow) + "<br><br>");
+
+
+
 
         // JDBC
         if (validCookie(request)) {
@@ -109,21 +115,62 @@ public class Dbg extends HttpServlet {
         }
 
 
-        pageBody.append("<br><br>" +
-                "<br> <b>AuthorizationChecker income</b>" +
-                "<br> -----------------------------------" +
-                "<br>" + cookieToString(COOKIE_ARR) +
-                "<br> -----------------------------------"
+
+
+
+
+
+        pageBody.append("<br><br><br><b>AuthorizationChecker income</b>");
+
+        String cookArrStr = null;
+        if (COOKIE_ARR != null) {
+            cookArrStr = ""; //очистим от null, т.к циклом будут дописываться строки
+            for (Cookie c : COOKIE_ARR) {
+                cookArrStr += c.getName()+"="+c.getValue() + "<br>";
+            }
+        }
+        pageBody.append("<br>-----------------------------------<br>" +
+                cookArrStr + "<br>-----------------------------------"
         );
 
-        pageBody.append("<br><br><br>");
-        pageBody.append("<h3>MD5</h3>");
-        pageBody.append("Get MD5: <input type=\"text\" name=\"input\" value=\"\"><br>");
-        pageBody.append("<input type=\"submit\" value=\"Convert to MD5\"><br><br><br>");
+
+
+
+        String MD5=
+                "<br><br><br>" +
+                "<h3>MD5</h3>" +
+                "<br>" +
+                "<form action=\"/project/dbg\">" +
+                "        <input  type=\"text\"     name=\"input\"    placeholder=\"type here\" /><br>" +
+                "        <button type=\"submit\"   style=\"border-radius: 3px;\">Convert</button>" +
+                "</form>" +
+                "<br>";
+        pageBody.append(MD5);
+
 
         // Попробуем получить текст и хеш из прошлого вызова
-        String input = request.getParameter("input");
-        pageBody.append(input != null ? (input + " is " + getMD5(input)) : "");
+        //Вариант 1
+        pageBody.append("Попробуем получить текст и хеш из прошлого вызова<br><br><b>Вариант 1</b><br><br>");
+        String inputForMD5Encode = request.getParameter("input");
+        pageBody.append(inputForMD5Encode != null ? (inputForMD5Encode + " is " + getMD5(inputForMD5Encode)) : "");
+
+        //Вариант 2 hmResult
+        pageBody.append("<br><br><b>Вариант 2 (hmResult)</b><br><br>");
+        String resultsMD5 = hmResult.get("MD5");
+    
+        if (inputForMD5Encode!=null & !inputForMD5Encode.equals("")){ //пришел запрос с параметром input
+            if (resultsMD5==null){ //первое добавление, перетрем null в resultsMD5
+                resultsMD5="";
+            }
+            resultsMD5 += inputForMD5Encode + "=" + getMD5(inputForMD5Encode)+"<br>";
+
+            hmResult.put("MD5", resultsMD5);
+        }
+
+        pageBody.append(resultsMD5);
+
+
+
 
         pageBody.append("<br><br><br><br><br><br>" +
                 "<br> <b>REQUEST parameters</b>" +
@@ -144,17 +191,6 @@ public class Dbg extends HttpServlet {
         response.getWriter().println(pageBody);
     }
 
-    private String cookieToString(Cookie[] coo) {
-        if (coo != null) {
-            StringBuilder sb = new StringBuilder();
-            for (Cookie c : coo) {
-                sb.append(c.getValue() + "<br>");
-            }
-            return sb.toString();
-        } else
-            return "null";
-
-    }
 
     private String getMD5(String t) {
         if (t.equals("")) {
@@ -197,7 +233,8 @@ public class Dbg extends HttpServlet {
     // For enterSuccess users
     private void pageAuthorized(HttpServletRequest request) {
         StringBuilder pageBody = null;
-        String ACTION_URL = "http://" + request.getLocalAddr() + ":8080/ignis/test";
+//        String ACTION_URL = "http://" + request.getLocalAddr() + ":8080/project/test";
+        String ACTION_URL = String.valueOf(request.getRequestURL());
         Date dateNow = new Date();
         String date = new SimpleDateFormat("dd-MM-yyyy").format(dateNow);
         String time = new SimpleDateFormat("HH:mm:ss").format(dateNow);

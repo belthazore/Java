@@ -34,8 +34,8 @@
   </servlet>
 
   <servlet>
-    <servlet-name>servlet</servlet-name>
-    <servlet-class>Servlet</servlet-class>
+    <servlet-name>dbg</servlet-name>
+    <servlet-class>Dbg</servlet-class>
   </servlet>
 
 
@@ -59,6 +59,11 @@
   <servlet-mapping>
     <servlet-name>home</servlet-name>
     <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>dbg</servlet-name>
+    <url-pattern>/dbg</url-pattern>
   </servlet-mapping>
 
 </web-app>

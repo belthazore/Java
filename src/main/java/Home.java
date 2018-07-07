@@ -2,6 +2,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 // Сюда попадают те, кто успешно авторизовался тут '/login'
@@ -11,7 +14,8 @@ import java.io.IOException;
 // clients - зарегистрированные пользователи
 
 public class Home extends HttpServlet {
-//    String SEARCH_RESULT = "";
+
+    Map<String, ArrayList<String>> SEARCH_RESULTS = new HashMap<>();
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -28,8 +32,135 @@ public class Home extends HttpServlet {
         response.setContentType("text/html;charset=utf-8");
 
 
-        // TODO: решить проблему добавления через "link rel"
-        String style =
+        String head =
+                "<head>" +
+                "  <title>Java Tomcat test server | Login</title>" +
+                getStyle() +
+                "</head>";
+
+
+        String find_history = "",create_history = "";
+
+        // если так не делать, то в кейсе 'action==null' блок
+        // 'if ( action!=null & (action.equals("find") | action.equals("create") ){}'
+        // дает NullPointerException =(
+        String actionNeedCheck = request.getParameter("action");
+        String orderIdNeedCheck = request.getParameter("order_id");
+        String action = ( actionNeedCheck==null ? "" : actionNeedCheck);
+        String orderId = ( orderIdNeedCheck==null ? "" : orderIdNeedCheck);
+
+
+
+
+
+
+
+        if (action.equals("find") | action.equals("create")){
+                String actionResult = doAction(action, orderId);
+                if (actionResult != null) {
+                    try {
+                        SEARCH_RESULTS.get(action).add(getDateTimeNow() + " " + actionResult); // добавим результат запроса в историю
+                    }catch (NullPointerException e){ //еще нет такого ключа 'action'
+                        ArrayList <String> tempArrList = new ArrayList<>();
+                        tempArrList.add(getDateTimeNow() + " " + actionResult);
+                        SEARCH_RESULTS.put(action, tempArrList);
+                    }
+
+//                        dateTimeNow + " " + actionResult;
+//                String[] resultsByActionCurr = SEARCH_RESULTS.get(action) + new String[]{"1"}; // ["010203 test1", "010203 test2"]
+
+//                SEARCH_RESULTS.put(action, new String[]{"1"});
+//                SEARCH_RESULTS2.get(action).add(getDateTimeNow() + " " + actionResult); // Добавим в ArrayList результат выполнения нового запроса
+                }
+        }
+
+
+
+
+
+
+
+        // - - - - - - - - - - -   Find order   - - - - - - - - - - -
+        String body =
+                "<body>" +
+                        "  <div class=\"login-page\">" +
+                        "    <div class=\"form\" >" +
+                        "        <b>Find order</b>" +
+                        "        <form action=\"/project/home\" style=\"width: 300px;margin: auto;\">" +
+                        "            <br><br>" +
+                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
+                        "            <br><br>" +
+                        "<input name=\"action\" value=\"find\" type=\"hidden\">" +
+                        "            <button type=\"submit\" style=\"border-radius: 3px;\">Find</button>" +
+                        "        </form>" +
+                        getHistoryByAction("find") +
+                        "    </div>" +
+                        "    <div class=\"form\">" +
+                        "        <b>Create Order</b>" +
+                        "        <form action=\"/project/home\" style=\"width: 300px;margin: auto;\">" +
+                        "            <br><br>" +
+                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
+                        "            <input name=\"product\" placeholder=\"product\" type=\"text\">" +
+                        "            <input name=\"phone_number\" placeholder=\"client phone\" type=\"text\">" +
+                        "            <br><br>" +
+                        "            <button type=\"submit\" style=\"border-radius: 3px;\">Create</button>" +
+                        "        </form>" +
+                        getHistoryByAction("create") +
+                        "    </div>" +
+                        "  </div>" +
+                        "</body>";
+        PAGE.append(head+body);
+        response.getWriter().println(PAGE);
+    }
+
+
+    // Example: 06-07-2018 22:38:28
+    private String getDateTimeNow(){
+        return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+    }
+
+    private String getHistoryByAction(String action){
+        ArrayList<String> arrayListSearchResults = SEARCH_RESULTS.get(action);
+        if (arrayListSearchResults!=null){
+            String buffer="<br><br><br><b>History</b><br>-----------------------------------------------------------------<br><br>";
+            for(Object o : arrayListSearchResults.toArray()){
+                buffer+=o+"<br><br>";
+            }
+            return buffer;
+        }else
+            return null;
+    }
+
+    private String doAction(String action, String orderId){
+        String result = null;
+        jdbcPostgres psql = null;
+        try {
+            psql = new jdbcPostgres();
+
+            switch (action) {
+                case "find":
+                    ResultSet rs = psql.execute("SELECT * FROM orders WHERE order_id='" + orderId + "'");
+                    rs.next();
+                    result = rs.getString("order_id") +" | "+ rs.getString("product") +" | "+ rs.getString("client_phone");
+                    break;
+                case "create":
+                    result = "test empty";
+                    break;
+                default:
+                    throw new Exception("Wrong action");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (psql != null)
+                psql.closeConnection();
+        }
+        return result;
+    }
+
+    // TODO: решить проблему добавления через "link rel"
+    private String getStyle(){
+        return
                 "  <style type=\"text/css\">\n" +
                         ".login-page {\n" +
                         "      width: 800px;\n" +
@@ -132,45 +263,6 @@ public class Home extends HttpServlet {
                         "      -moz-osx-font-smoothing: grayscale;      \n" +
                         "    }" +
                         "  </style>\n";
-
-        String head =
-                "<head>\n" +
-                "  <title>Java Tomcat test server | Login</title>\n" +
-//                "  <link rel=\"stylesheet\" type=\"text/css\" href=\"/home.css\">" +
-                style +
-                "</head>\n";
-//        PAGE.append(head);
-
-        String body =
-                "<body>\n" +
-                        "\n" +
-                        "  <div class=\"login-page\">\n" +
-                        "    <div class=\"form\" >\n" +
-                        "        <b>Find order</b>\n" +
-                        "        <form action=\"/project/\" style=\"width: 300px;margin: auto;\">\n" +
-                        "            <br><br>\n" +
-                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">\n" +
-                        "            <br><br>\n" +
-                        "            <button type=\"submit\" style=\"border-radius: 3px;\">Find</button>\n" +
-                        "        </form>\n" +
-                        "    </div>\n" +
-                        "    \n" +
-                        "    <div class=\"form\">\n" +
-                        "        <b>Create Order</b>\n" +
-                        "        <form action=\"/project/\" style=\"width: 300px;margin: auto;\">\n" +
-                        "            <br><br>\n" +
-                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">\n" +
-                        "            <input name=\"product\" placeholder=\"product\" type=\"text\">\n" +
-                        "            <input name=\"phone_number\" placeholder=\"client phone\" type=\"text\">\n" +
-                        "            <br><br>\n" +
-                        "            <button type=\"submit\" style=\"border-radius: 3px;\">Create</button>\n" +
-                        "        </form>\n" +
-                        "    </div>\n" +
-                        "  </div>\n" +
-                        "\n" +
-                        "</body>";
-        PAGE.append(head+body);
-        response.getWriter().println(PAGE);
     }
 }
 

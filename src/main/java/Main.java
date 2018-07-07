@@ -4,10 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -239,17 +237,73 @@ public class Main {
                 e.printStackTrace();
             }
             File file = new File("//home//nnm//.android");
-            out.println(file.exists());
-            out.println(Arrays.asList(new File("//home//nnm//").list()).contains(".android"));
+            out.println("Are //home//nnm//.android exist? \n"+file.exists()+"\n");
+            out.println("Are home/nnm contains \".android\" folder: "+Arrays.asList(new File("//home//nnm//").list()).contains(".android")+"\n");
 //            out.println(Arrays.toString(str[5]));
 
             out.println("KS: "+ Cookies.hmCookieTime.keySet());
 
             ResultSet rsUser = psql.execute("SELECT * FROM clients WHERE login='user' AND password='password'");
             rsUser.next();
-            out.println(rsUser.getString(3)); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
+            out.println("rsUser.getString: "+rsUser.getString(3)); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
 
 
+            out.println("\n\n\n- - - - - - - - - - - - - - - - - - - - - - - - ");
+            out.println("- - - - Date formats");
+            out.println("- - - - - - - - - - - - - - - - - - - - - - - - ");
+
+            Date dateNow = new Date();
+            out.println(dateNow);
+            out.println(new SimpleDateFormat("dd-MM-yyyy").format(dateNow));
+            out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(dateNow));
+
+
+            out.println("\n\n\n- - - - - - - - - - - - - - - - - - - - - - - - ");
+            out.println("- - - - HASHMAP Experements");
+            out.println("- - - - - - - - - - - - - - - - - - - - - - - - ");
+
+            Map<String, String[]> SEARCH_RESULTS = new HashMap<>(); // K - блок страницы(прим. "Find order"), V - массив String
+            // Поиск заказов (Find orders)
+            String dateTimeNow = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+            SEARCH_RESULTS.put("fo", new String[]{
+                    "06-07-2018 21:01:35  1 | Merenga: 10 pcs | 0672112508",
+                    "07-07-2018 09:43:08  2 | Merenga: 33 pcs | 0672112008"
+            });
+
+            // Создание заказа (Find orders)
+            SEARCH_RESULTS.put("create order", new String[]{
+                    "06-07-2018 00:48:46   тут всякая дичь из psql",
+                    "06-07-2018 14:05:46   тут всякая дичь из psql"
+            });
+
+
+            out.println("keySet(): "+SEARCH_RESULTS.keySet());
+            for (String[] strings : SEARCH_RESULTS.values()) {
+                out.println("i: " + Arrays.toString(strings));
+            }
+
+            out.println("\n\n\n- - - - - - - - - - - - - - - - - - - - - - - - ");
+            out.println("- - - - ArrayList<String> Experements");
+            out.println("- - - - - - - - - - - - - - - - - - - - - - - - ");
+
+            ArrayList<String> arrListStr = new ArrayList<>();
+            arrListStr.add("test_1");
+            arrListStr.add("test_2");
+            arrListStr.add("test_3");
+            arrListStr.size();
+            String buff="";
+            for (Object s : arrListStr.toArray()){
+                buff+=s;
+            }
+            out.println("buff: "+buff);
+            out.println("arrListStr.toArray(): "+ Arrays.toString(arrListStr.toArray()));
+
+
+
+            /*
+            "06-07-2018 00:48:46 "+"дичь из psql"
+
+            */
 
 
 

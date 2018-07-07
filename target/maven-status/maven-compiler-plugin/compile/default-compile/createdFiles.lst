@@ -9,8 +9,8 @@ Main$EncDec.class
 jdbcPostgres.class
 Hash.class
 Main.class
+Dbg.class
 AuthorizationChecker.class
 Gate.class
 Registration.class
-Servlet.class
 Cookies.class
