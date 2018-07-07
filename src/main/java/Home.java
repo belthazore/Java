@@ -128,7 +128,7 @@ public class Home extends HttpServlet {
             }
             return buffer;
         }else
-            return null;
+            return "";
     }
 
     private String doAction(String action, String orderId){

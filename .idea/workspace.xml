@@ -2,26 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54fab9fb-3b83-434e-ba58-205427c3e1d1" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Dbg.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Dbg.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Home.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Home.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Home.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Home.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main$EncDec.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main$EncDec.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main$MyThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main$MyThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main$TenMinutesThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main$TenMinutesThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Servlet.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Home.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Home.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$EncDec.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$EncDec.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$MyThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$MyThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$TenMinutesThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$TenMinutesThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/web.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -67,8 +48,8 @@
       <file leaf-file-name="Home.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/Home.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="139">
-              <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+            <state relative-caret-position="186">
+              <caret line="125" column="22" lean-forward="true" selection-start-line="125" selection-start-column="22" selection-end-line="125" selection-end-column="22" />
               <folding>
                 <element signature="method#getStyle#0;class#Home#0" />
               </folding>
@@ -630,8 +611,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/Home.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+        <state relative-caret-position="186">
+          <caret line="125" column="22" lean-forward="true" selection-start-line="125" selection-start-column="22" selection-end-line="125" selection-end-column="22" />
           <folding>
             <element signature="method#getStyle#0;class#Home#0" />
           </folding>
