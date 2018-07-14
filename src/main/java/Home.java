@@ -24,6 +24,7 @@ public class Home extends HttpServlet {
             response.sendRedirect("/project/login");
         }
 
+
         // T ODO: 1. добавить проверку куки, если ее нет или она не валидна - редирект на /login
         // T ODO: 2. имя юзера брать с cookie [] по ключу user(? или брать куку, по ней в HM находить user)
 
@@ -105,7 +106,7 @@ public class Home extends HttpServlet {
                         getHistoryByAction("find") +
                         "    </div>" +
                         "    <div class=\"form\" float=\"right\">" +
-                        "        <b>Create Order</b>" +
+                        "        <b>Create order</b>" +
                         "        <form action=\"/project/home\" style=\"width: 300px;margin: auto;\">" +
                         "            <br><br>" +
 //                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +

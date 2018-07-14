@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,17 @@ public class Dbg extends HttpServlet {
         response.setContentType(CONTENT_TYPE);
 
         pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br><br>");
+
+        pageBody.append("1. Cookies in PSQL:<br>"+Cookies.hmCookieTime.keySet()+"<br><br>");
+        pageBody.append("1.1 Diffs time savings:<br>");
+        Collection<Long> arr = Cookies.hmCookieTime.values();
+        for (long timeSave :arr) {
+            float diffMinutes = (Cookies.getTimeNow() - timeSave)/60000;
+            pageBody.append(timeSave+ ": " + diffMinutes+"<br>");
+        }
+        pageBody.append("<br><br>");
+        pageBody.append("2. Registered users in PSQL:<br>"+Users.registeredUsers.keySet()+"<br><br>");
+
 
         Date dateNow = new Date();
         pageBody.append("<getFormAuthorization action=\"" + ACTION_URL + "\">");
@@ -158,8 +170,8 @@ public class Dbg extends HttpServlet {
         pageBody.append("<br><br><b>Вариант 2 (hmResult)</b><br><br>");
         String resultsMD5 = hmResult.get("MD5");
     
-        if (inputForMD5Encode!=null & !inputForMD5Encode.equals("")){ //пришел запрос с параметром input
-            if (resultsMD5==null){ //первое добавление, перетрем null в resultsMD5
+        if (inputForMD5Encode!=null){
+            if(!inputForMD5Encode.equals("") & resultsMD5==null){ //пришел запрос с параметром input. Первое добавление, перетрем null в resultsMD5
                 resultsMD5="";
             }
             resultsMD5 += inputForMD5Encode + "=" + getMD5(inputForMD5Encode)+"<br>";
@@ -188,7 +200,15 @@ public class Dbg extends HttpServlet {
         );
         pageBody.append("validCookie(request): " + validCookie(request));
         pageBody.append("<br> HashMe.getMD5(\"test\"): " + getMD5("test") + "</getFormAuthorization>");
+
+
+
+
+
         response.getWriter().println(pageBody);
+
+
+
     }
 
 
@@ -220,30 +240,6 @@ public class Dbg extends HttpServlet {
         return COOKIE_ARR != null;
     }
 
-    private void cookieSetGenerateAndSave(HttpServletResponse response){
-        long timeNowMillisec = System.currentTimeMillis();
-        String md5 = getMD5(String.valueOf(timeNowMillisec));
-        Cookie cook = new Cookie("cook", md5);
-        cook.setMaxAge(1800); // in seconds
-        response.addCookie(cook);
-        HASHMAP.put(md5, timeNowMillisec);
-        // psql insert
-    }
-
-    // For enterSuccess users
-    private void pageAuthorized(HttpServletRequest request) {
-        StringBuilder pageBody = null;
-//        String ACTION_URL = "http://" + request.getLocalAddr() + ":8080/project/test";
-        String ACTION_URL = String.valueOf(request.getRequestURL());
-        Date dateNow = new Date();
-        String date = new SimpleDateFormat("dd-MM-yyyy").format(dateNow);
-        String time = new SimpleDateFormat("HH:mm:ss").format(dateNow);
-        pageBody.append("<getFormAuthorization action=\"" + ACTION_URL + "\">");
-        pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br>");
-        pageBody.append("<br>");
-        pageBody.append(time).append("<br>" + date + "<br><br>");
-
-    }
 
 
     // Возвращает переданный cookie или null
@@ -253,7 +249,7 @@ public class Dbg extends HttpServlet {
 //        }else
 //            return null;
 //        return String.valueOf(COOKIE_ARR.length);
-        return "huy";
+        return "test";
     }
 
 //    private void cookieTimeUpdateIfNeed(HttpServletRequest request) {

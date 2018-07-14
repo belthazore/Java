@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.FileHandler;
@@ -22,43 +23,57 @@ public class Main {
     static Map<String, Long> hmCookieTime =
             Collections.synchronizedMap(new HashMap<String, Long>());
     static jdbcPostgres psql = new jdbcPostgres();
-
-    static {
-        //jdbc кеширование в HM кук(Str) и времени(Str) БД, таблицы cooks
-        try {
-            ResultSet rsRowCount = psql.execute("SELECT count(*) FROM cooks"); // количество записей
-            rsRowCount.next();
-            int rowsCount = Integer.parseInt(rsRowCount.getString(1));
-            // out.println("rowsCount: " + rowsCount);
-
-            ResultSet rsData = psql.execute("SELECT * FROM cooks");
-            for (int c = 1; c <= rowsCount; c++) {
-                rsData.next();
-                String cook = rsData.getString(1);
-                long time = Long.parseLong(rsData.getString(2));
-                // out.println(cook + ": " + time);
-                hmCookieTime.put(cook, time);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-//        } finally {
-//            psql.closeConnection();
+//
+//    static {
+//        //jdbc кеширование в HM кук(Str) и времени(Str) БД, таблицы cooks
+//        try {
+//            ResultSet rsRowCount = psql.execute("SELECT count(*) FROM cooks"); // количество записей
+//            rsRowCount.next();
+//            int rowsCount = Integer.parseInt(rsRowCount.getString(1));
+//            // out.println("rowsCount: " + rowsCount);
+//
+//            ResultSet rsData = psql.execute("SELECT * FROM cooks");
+//            for (int c = 1; c <= rowsCount; c++) {
+//                rsData.next();
+//                String cook = rsData.getString(1);
+//                long time = Long.parseLong(rsData.getString(2));
+//                // out.println(cook + ": " + time);
+//                hmCookieTime.put(cook, time);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
 //        }
+////        } finally {
+////            psql.closeConnection();
+////        }
+//    }
+
+    static Map<String, String> registeredUsers =
+            Collections.synchronizedMap(new HashMap<String, String>());
+
+    static{
+        ResultSet rs = psql.execute("SELECT * FROM users");
+        try {
+            if (rs!=null) {
+                while (rs.next()) {
+                    registeredUsers.put(rs.getString("login"), rs.getString("password"));
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
 
     public static void main(String[] args) {
         try {
             out.println("\n 1. PGSQL testing Select queryes");
-            ResultSet rsForCC = psql.execute("select * from clients"); // для получения количеста колонок
+            ResultSet rsForCC = psql.execute("select * from users"); // для получения количеста колонок
             out.println("Column count = " + rsForCC.getMetaData().getColumnCount());
 
-            ResultSet rsForRC = psql.execute("select count(*) from clients"); // для получения количеста записей
+            ResultSet rsForRC = psql.execute("select count(*) from users"); // для получения количеста записей
             rsForRC.next();
             out.println("Row count = " + rsForRC.getString(1));
 
-            ResultSet rs = psql.execute("SELECT * from clients where login='first'");
+            ResultSet rs = psql.execute("SELECT * from users where login='first'");
             out.println("In search by login \"first\" result rows: " + psql.getRowCount(rs));
 
 
@@ -76,20 +91,6 @@ public class Main {
 //            out.println("Ищем в HashMap несущ-й ключ: " + hmCookieTime.get("not real key"));
 //            out.println("HashMap all keys: " + hmCookieTime.keySet());
 
-            //jdbc
-//            ResultSet rsRowCount = psql.execute("SELECT count(*) FROM cooks"); // количество записей
-//            rsRowCount.next();
-//            int rowsCount = Integer.parseInt(rsRowCount.getString(1));
-//            out.println("rowsCount: "+rowsCount);
-//
-//            ResultSet rsData = psql.execute("SELECT * FROM cooks");
-//            for (int c = 1; c<=rowsCount;c++){
-//                rsData.next();
-//                String cook = rsData.getString(1);
-//                long time = Long.parseLong(rsData.getString(2));
-//                out.println(cook+": "+time);
-//                hmCookieTime.put(cook, time);
-//            }
             out.println("DONE");
             out.println(hmCookieTime.keySet());
 
@@ -130,11 +131,6 @@ public class Main {
 //            out.println("Remove nothing: " + hm.remove("key"));
 
 
-
-
-
-
-
             //Тест удаления из PSQL
             out.println("\n ____ Тест удаления из PSQL ____");
 
@@ -144,14 +140,11 @@ public class Main {
                     "('cook_test3', '1529658000003')";
 
 
-
-            // TODO: готово
             // 01. Добавить запись, если уже есть - обновить
             // (Обновление времени куки, если клиент зашел)
             String QUERY_INSERT_ONE = "INSERT INTO cooks(cookie, time) VALUES ('cook_test1', '1529658000001')" +
                     " ON CONFLICT (cookie) DO UPDATE SET time =  '1529658000001'";
 //            out.println(QUERY_INSERT_ONE + ":\n" + psql.execute(QUERY_INSERT_ONE));
-
 
 
             // 02. поиск (ХЗ)
@@ -160,16 +153,10 @@ public class Main {
 //            out.println(QUERY_SELECT_ONE + ":\n" + psql.getRowCount(rsSelectOne));
 
 
-
             // 03. Удаление
             String QUERY_RM_ONE = "DELETE FROM cooks WHERE cookie='cook_test777'";
             psql.execute(QUERY_RM_ONE); // "Запрос не вернул результата"
             out.println("\n" + QUERY_RM_ONE + ":\n" + "");
-
-
-
-
-
 
 
             // Наполним тестовыми данными
@@ -185,26 +172,26 @@ public class Main {
             // До
             /**
 
-            for (String s : arr){
-                long timeSaveCook = hmCookieTime.get(s); //берем время куки(String) из HM >> в long
-                long diff = timeNow-timeSaveCook;
-                float diffSec = (float) (diff/1000);
-                float diffMin = diffSec/60;
-                boolean needRemove = (diffMin>10);
-                out.println(s+":"+"\n"+"Diff is: "+diff+"(Sec: "+diffSec+", Min: "+diffMin+").\nNeed remove: "+needRemove+"\n");
-                //Удаление
-                if (needRemove) {
-                    //из HM
-                    hmCookieTime.remove(s);
-                    //из PG
-                    psql.execute("DELETE FROM cooks WHERE cookie='"+s+"'");
-                }
-            }
+             for (String s : arr){
+             long timeSaveCook = hmCookieTime.get(s); //берем время куки(String) из HM >> в long
+             long diff = timeNow-timeSaveCook;
+             float diffSec = (float) (diff/1000);
+             float diffMin = diffSec/60;
+             boolean needRemove = (diffMin>10);
+             out.println(s+":"+"\n"+"Diff is: "+diff+"(Sec: "+diffSec+", Min: "+diffMin+").\nNeed remove: "+needRemove+"\n");
+             //Удаление
+             if (needRemove) {
+             //из HM
+             hmCookieTime.remove(s);
+             //из PG
+             psql.execute("DELETE FROM cooks WHERE cookie='"+s+"'");
+             }
+             }
 
-            // После
-            out.println(hmCookieTime.keySet());
+             // После
+             out.println(hmCookieTime.keySet());
              */
-            Logger logger = Logger.getLogger( Main.class.getName() );
+            Logger logger = Logger.getLogger(Main.class.getName());
             FileHandler fh = new FileHandler("loggerExample.log", false);
             fh.setLevel(Level.FINE);
 
@@ -225,8 +212,8 @@ public class Main {
 
             out.println("\n-- Thread example --");
 
-            TenMinutesThread tmt = new TenMinutesThread();
-            Thread thr = new Thread(tmt);
+//            TenMinutesThread tmt = new TenMinutesThread();
+//            Thread thr = new Thread(tmt);
 //            thr.start();
 
             out.println("\n-- File write example (for Logs) --");
@@ -237,15 +224,15 @@ public class Main {
                 e.printStackTrace();
             }
             File file = new File("//home//nnm//.android");
-            out.println("Are //home//nnm//.android exist? \n"+file.exists()+"\n");
-            out.println("Are home/nnm contains \".android\" folder: "+Arrays.asList(new File("//home//nnm//").list()).contains(".android")+"\n");
+            out.println("Are //home//nnm//.android exist? \n" + file.exists() + "\n");
+            out.println("Are home/nnm contains \".android\" folder:\n" + Arrays.asList(new File("//home//nnm//").list()).contains(".android") + "\n");
 //            out.println(Arrays.toString(str[5]));
 
-            out.println("KS: "+ Cookies.hmCookieTime.keySet());
+//            out.println("KS: "+ Cookies.hmCookieTime.keySet());
 
-            ResultSet rsUser = psql.execute("SELECT * FROM clients WHERE login='user' AND password='password'");
+            ResultSet rsUser = psql.execute("SELECT * FROM users WHERE login='l' AND password='p'");
             rsUser.next();
-            out.println("rsUser.getString: "+rsUser.getString(3)); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
+            out.println("rsUser.getString: " + rsUser.getString(3)); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
 
 
             out.println("\n\n\n- - - - - - - - - - - - - - - - - - - - - - - - ");
@@ -277,7 +264,7 @@ public class Main {
             });
 
 
-            out.println("keySet(): "+SEARCH_RESULTS.keySet());
+            out.println("keySet(): " + SEARCH_RESULTS.keySet());
             for (String[] strings : SEARCH_RESULTS.values()) {
                 out.println("i: " + Arrays.toString(strings));
             }
@@ -291,22 +278,33 @@ public class Main {
             arrListStr.add("test_2");
             arrListStr.add("test_3");
             arrListStr.size();
-            String buff="";
-            for (Object s : arrListStr.toArray()){
-                buff+=s;
+            String buff = "";
+            for (Object s : arrListStr.toArray()) {
+                buff += s;
             }
-            out.println("buff: "+buff);
-            out.println("arrListStr.toArray(): "+ Arrays.toString(arrListStr.toArray()));
+            out.println("buff: " + buff);
+            out.println("arrListStr.toArray(): " + Arrays.toString(arrListStr.toArray()));
+
+
+            out.println("- - - - - - - - - - - - - - - - - - - - - - - - ");
+
+
+//            ResultSet rs3 = jdbcPostgres.execute("SELECT * FROM users");
+//            try {
+//                if (rs3!=null) {
+//                    while (rs3.next()) {
+//                        out.println(rs3.getString("login")+" | "+rs3.getString("password"));
+//                    }
+//                }
+//            } catch (SQLException e) { e.printStackTrace(); }
+
+//            out.println(Users.registeredUsers.keySet());
+//            out.println("Users.isRegisteredUser: " + Users.isRegisteredUser("l","p") );
 
 
 
-            /*
-            "06-07-2018 00:48:46 "+"дичь из psql"
-
-            */
-
-
-
+            out.println(registeredUsers.keySet());
+            out.println(Users.registeredUsers.keySet());
 
 
         } catch (Exception e) {
@@ -318,11 +316,6 @@ public class Main {
 //        }
     }
 
-
-
-    static class EncDec{
-
-    }
 
     // Класс-поток, можно указать интервал и число запусков
     static class MyThread implements Runnable {
@@ -417,8 +410,8 @@ public class Main {
                     out.println("\n");
                     new Main();
                 }
-            }catch (Exception ignored){}
-            finally {
+            } catch (Exception ignored) {
+            } finally {
                 psql.closeConnection();
             }
         }

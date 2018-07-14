@@ -31,7 +31,7 @@ public class Gate extends HttpServlet {
 
 //        Переход с параметрами login|password (!=null)
         if (loginCheck != null & passwordCheck != null) {
-            if (Client.isRegisteredClient(enteredLogin, enteredPassword)) {
+            if (Users.isRegisteredUser(enteredLogin, enteredPassword)) {
                 Cookie cook = Cookies.getNewCookie();
                 response.addCookie(cook);
                 Cookies.saveCookie(cook.getValue()); // сохраним в HM и PSQL новую куку с текущим временем(long)
@@ -52,9 +52,6 @@ public class Gate extends HttpServlet {
         }
 
 
-        PAGE.append(Cookies.printHm());
 
-
-        response.getWriter().println(PAGE);
     }
 }

@@ -1,15 +1,15 @@
 Main$MyThread.class
-Client.class
 Main$TenMinutesThread.class
 LoginOld.class
 Cookies$TenMinutesThread.class
 Home.class
+Cookies$1.class
 LoginCheck.class
-Main$EncDec.class
 jdbcPostgres.class
 Hash.class
 Main.class
 Dbg.class
+Users.class
 AuthorizationChecker.class
 Gate.class
 Registration.class

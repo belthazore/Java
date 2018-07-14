@@ -17,7 +17,6 @@
         <input  type="password" name="password" placeholder="password" /><br>
         <button type="submit"   style="border-radius: 3px;">Login</button>
       </form>
-
     </div>
   </div>
 
