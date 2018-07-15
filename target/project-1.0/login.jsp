@@ -16,11 +16,14 @@
         <input  type="text"     name="login"    placeholder="login" /><br>
         <input  type="password" name="password" placeholder="password" /><br>
         <button type="submit"   style="border-radius: 3px;">Login</button>
+          <!-- Если авторизация не успешна - сообщим -->
+        <% String badResult = request.getParameter("badResult"); %>
+        <p style="color: red"><%= ( badResult==null ? "" : ("<br>"+badResult) ) %></p>
       </form>
     </div>
-  </div>
+
+   </div>
 
 </body>
 
 </html>
-

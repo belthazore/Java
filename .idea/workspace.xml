@@ -1,44 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="54fab9fb-3b83-434e-ba58-205427c3e1d1" name="Default" comment="Improved auto-delete Cookies, Gate, validation parameters">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/nnm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/nnm.xml" afterDir="false" />
+    <list default="true" id="54fab9fb-3b83-434e-ba58-205427c3e1d1" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loggerExample.log" beforeDir="false" afterPath="$PROJECT_DIR$/loggerExample.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/resources/login.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Users.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Cookies.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Cookies.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Dbg.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Dbg.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Gate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Gate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Home.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Home.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/jdbcPostgres.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/jdbcPostgres.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Client.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Cookies$TenMinutesThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Cookies$TenMinutesThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Cookies.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Cookies.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Dbg.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Dbg.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Gate.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Gate.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Home.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Home.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main$EncDec.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main$MyThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main$MyThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main$TenMinutesThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main$TenMinutesThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/jdbcPostgres.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/jdbcPostgres.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/project-1.0.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Cookies$TenMinutesThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Cookies$TenMinutesThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Cookies.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Cookies.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Dbg.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Dbg.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Gate.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Gate.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Home.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Home.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$EncDec.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$EncDec.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$MyThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$MyThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$TenMinutesThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main$TenMinutesThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/jdbcPostgres.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/WEB-INF/classes/jdbcPostgres.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/project-1.0/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/project-1.0/login.jsp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -64,11 +32,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="login.jsp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="login.jsp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resources/login.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="16" selection-start-line="16" selection-end-line="16" />
+            <state relative-caret-position="210">
+              <caret line="14" column="31" lean-forward="true" selection-start-line="14" selection-start-column="31" selection-end-line="14" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -88,8 +56,8 @@
       <file leaf-file-name="Gate.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/Gate.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="429">
-              <caret line="53" selection-start-line="53" selection-end-line="53" />
+            <state relative-caret-position="250">
+              <caret line="40" column="43" lean-forward="true" selection-start-line="40" selection-start-column="43" selection-end-line="40" selection-end-column="43" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -136,11 +104,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Dbg.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Dbg.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/Dbg.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="549">
-              <caret line="171" selection-start-line="171" selection-end-line="171" />
+            <state relative-caret-position="324">
+              <caret line="156" column="64" selection-start-line="156" selection-start-column="64" selection-end-line="156" selection-end-column="64" />
             </state>
           </provider>
         </entry>
@@ -208,13 +176,13 @@
         <option value="$PROJECT_DIR$/src/main/project/WEB-INF/web.xml" />
         <option value="$PROJECT_DIR$/src/main/java/Client.java" />
         <option value="$PROJECT_DIR$/src/main/java/Users.java" />
-        <option value="$PROJECT_DIR$/resources/login.jsp" />
         <option value="$PROJECT_DIR$/src/main/java/Home.java" />
-        <option value="$PROJECT_DIR$/src/main/java/Gate.java" />
         <option value="$PROJECT_DIR$/src/main/java/Dbg.java" />
         <option value="$PROJECT_DIR$/src/main/java/jdbcPostgres.java" />
         <option value="$PROJECT_DIR$/src/main/java/Cookies.java" />
         <option value="$PROJECT_DIR$/src/main/java/Main.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Gate.java" />
+        <option value="$PROJECT_DIR$/resources/login.jsp" />
       </list>
     </option>
   </component>
@@ -428,6 +396,14 @@
       <option name="presentableId" value="Default" />
       <updated>1529531934016</updated>
     </task>
+    <task id="LOCAL-00001" summary="Improved auto">
+      <created>1531604455687</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1531604455688</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -471,7 +447,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Improved auto-delete Cookies, Gate, validation parameters" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improved auto-delete Cookies, Gate, validation parameters" />
+    <MESSAGE value="Improved auto" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improved auto" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -600,23 +577,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/login.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" selection-start-line="16" selection-end-line="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Gate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="53" selection-start-line="53" selection-end-line="53" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/Users.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="295">
@@ -660,8 +620,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/Dbg.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="549">
-          <caret line="171" selection-start-line="171" selection-end-line="171" />
+        <state relative-caret-position="324">
+          <caret line="156" column="64" selection-start-line="156" selection-start-column="64" selection-end-line="156" selection-end-column="64" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Gate.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="250">
+          <caret line="40" column="43" lean-forward="true" selection-start-line="40" selection-start-column="43" selection-end-line="40" selection-end-column="43" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/login.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="31" lean-forward="true" selection-start-line="14" selection-start-column="31" selection-end-line="14" selection-end-column="31" />
         </state>
       </provider>
     </entry>

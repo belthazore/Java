@@ -29,7 +29,7 @@ public class Gate extends HttpServlet {
 
 
 
-//        Переход с параметрами login|password (!=null)
+//        Переход с параметрами login/password (!=null)
         if (loginCheck != null & passwordCheck != null) {
             if (Users.isRegisteredUser(enteredLogin, enteredPassword)) {
                 Cookie cook = Cookies.getNewCookie();
@@ -39,7 +39,7 @@ public class Gate extends HttpServlet {
                 response.sendRedirect("/project/home");
             } else {
 //                PAGE.append("lp NOT OK");
-                response.sendRedirect("/project/login?error=wrong+login+or+password+!");
+                response.sendRedirect("/project/login?badResult=Login+or+password+is+incorrect");
             }
         } else { //Переход без логина и пароля
             if (Cookies.isValidCookie(request)) {
