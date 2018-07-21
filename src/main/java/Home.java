@@ -156,7 +156,7 @@ public class Home extends HttpServlet {
 
             switch (action) {
                 case "find":
-                    ResultSet rs = psql.execute("SELECT * FROM orders WHERE order_id='" + params[0] + "'");
+                    ResultSet rs = psql.execute("SELECT * FROM orders WHERE order_id='" + params[0] + "'"); //todo inejction
                     rs.next();
                     result = rs.getString("order_id") +" | "+ rs.getString("product") +" | "+ rs.getString("client_phone");
                     break;
@@ -165,7 +165,7 @@ public class Home extends HttpServlet {
                         "INSERT INTO orders" +
                         "  (order_id, product, client_phone)" +
                         "VALUES" +
-                        "  (nextval('orders_order_id_seq'), '" + params[0] + "', '" + params[1] + "')";
+                        "  (nextval('orders_order_id_seq'), '" + params[0] + "', '" + params[1] + "')"; // RUTRNUNG
                     psql.execute(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
                     ResultSet rs2 = psql.execute("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
                     rs2.next();

@@ -1,12 +1,14 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,44 +25,6 @@ public class Main {
     static Map<String, Long> hmCookieTime =
             Collections.synchronizedMap(new HashMap<String, Long>());
     static jdbcPostgres psql = new jdbcPostgres();
-//
-//    static {
-//        //jdbc кеширование в HM кук(Str) и времени(Str) БД, таблицы cooks
-//        try {
-//            ResultSet rsRowCount = psql.execute("SELECT count(*) FROM cooks"); // количество записей
-//            rsRowCount.next();
-//            int rowsCount = Integer.parseInt(rsRowCount.getString(1));
-//            // out.println("rowsCount: " + rowsCount);
-//
-//            ResultSet rsData = psql.execute("SELECT * FROM cooks");
-//            for (int c = 1; c <= rowsCount; c++) {
-//                rsData.next();
-//                String cook = rsData.getString(1);
-//                long time = Long.parseLong(rsData.getString(2));
-//                // out.println(cook + ": " + time);
-//                hmCookieTime.put(cook, time);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-////        } finally {
-////            psql.closeConnection();
-////        }
-//    }
-
-    static Map<String, String> registeredUsers =
-            Collections.synchronizedMap(new HashMap<String, String>());
-
-    static{
-        ResultSet rs = psql.execute("SELECT * FROM users");
-        try {
-            if (rs!=null) {
-                while (rs.next()) {
-                    registeredUsers.put(rs.getString("login"), rs.getString("password"));
-                }
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-    }
 
 
     public static void main(String[] args) {
@@ -77,31 +41,9 @@ public class Main {
             out.println("In search by login \"first\" result rows: " + psql.getRowCount(rs));
 
 
-//            out.println("\n 2. Cook and HashMap tests");
-//            long timeNow = System.currentTimeMillis();
-//            Cookie coo = new Cookie("cook", String.valueOf(timeNow));
-//            out.println("View: " + coo.getName() + ":" + coo.getValue());
-//            out.println("Пут новая пара");
-//            hmCookieTime.put(coo.getName(), timeNow);
-//            out.println("Вот она: " + coo.getName() + ":" + hmCookieTime.get(coo.getName()));
-//            out.println("Пробуем добавить по тому же ключу");
-//            hmCookieTime.put(coo.getValue(), (timeNow + 1));
-//            out.println("Добавили");
-//            out.println("Теперь она: " + coo.getValue() + ":" + hmCookieTime.get(coo.getValue()));
-//            out.println("Ищем в HashMap несущ-й ключ: " + hmCookieTime.get("not real key"));
-//            out.println("HashMap all keys: " + hmCookieTime.keySet());
 
             out.println("DONE");
             out.println(hmCookieTime.keySet());
-
-            /*
-            in DB:
-                cOokIeTeSt: 1527441055061
-                cooTest1: 1527493625487
-                cooTest2: 1527493775487
-            hm.keySet():
-                [cook, 1529232657189, cOokIeTeSt, cooTest2, cooTest1]
-             */
 
 
             MyThread mt10 = new MyThread(0, 1000);
@@ -109,11 +51,6 @@ public class Main {
             new Thread(mt10).start();
 //            new Thread(mtInfinity).start();
 
-            //ждем 10 секунд и проверяем счетчики по первому и второму потоку
-//            Thread.sleep(10000);
-//            out.println("Counters:\nmt10: "+mt10.getCounter()+"\nmtInfinity: "+mtInfinity.getCounter());
-//            Thread.sleep(20000);
-//            out.println("Counters2:\nmt10: "+mt10.getCounter()+"\nmtInfinity: "+mtInfinity.getCounter());
 
             long from = getTimeNow();
             out.println(from);
@@ -122,13 +59,6 @@ public class Main {
             out.println(to);
             out.println("\nDIFF:\nsec: " + diffSeconds(from, to) + "\nmin: " + diffMinutes(from, to));
             out.println("test: " + diffMinutes(1, 68001));
-
-//            //Тест удаления из HashMap
-//            out.println("\n ____ Тест удаления из HashMap ____");
-//            Map<String, String> hm = new HashMap<>();
-//            hm.put("key", "val");
-//            out.println("Remove present pair: " + hm.remove("key"));
-//            out.println("Remove nothing: " + hm.remove("key"));
 
 
             //Тест удаления из PSQL
@@ -158,12 +88,6 @@ public class Main {
             psql.execute(QUERY_RM_ONE); // "Запрос не вернул результата"
             out.println("\n" + QUERY_RM_ONE + ":\n" + "");
 
-
-            // Наполним тестовыми данными
-//            hmCookieTime.put("cook1", getTimeNow()-60000); //текущее время минус 1 минуту
-//            hmCookieTime.put("cook2", getTimeNow()-12*60000); //текущее время минус ~12 минут
-
-            String[] arr = hmCookieTime.keySet().toArray(new String[0]);
 
 
             out.println();
@@ -301,39 +225,94 @@ public class Main {
 //            out.println(Users.registeredUsers.keySet());
 //            out.println("Users.isRegisteredUser: " + Users.isRegisteredUser("l","p") );
 
+            out.println("--------------- Properties Ex---------------");
+            Properties prop = new Properties();
+
+            try (InputStream input = new FileInputStream(".//conf//db.conf")) {
+
+                // load a properties file
+                prop.load(input);
+
+                // get the property value and print it out
+                out.println(prop.getProperty("login"));
+                out.println(prop.getProperty("password"));
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            out.println("\n\n--------------- Postgres Test ---------------");
+            ResultSet rsUsers = psql.execute("SELECT * FROM users");
+            try {
+                if (rsUsers!=null) {
+                    while (rsUsers.next()) {
+                        out.println(rsUsers.getString("login") + ": " + rsUsers.getString("password"));
+                    }
+                }
+            }
+            catch (Exception e) { e.printStackTrace(); }
+            finally { psql.closeConnection(); }
 
 
-            out.println(registeredUsers.keySet());
+
+
+
+            out.println("\n\n--------------- Thread and TimeUnit Test ---------------");
+            // Запуск:
+            MyThread mt = new MyThread(TimeUnit.MINUTES.toMillis(1));
+            Thread thread = new Thread(mt);
+            thread.setDaemon(true);
+//             thread.run();
+
+//             out.println(MyThread.sleepTime.MILLISECONDS);
+            out.println(enumTimeExample.MINUTES.get(1));
+            out.println(TimeUnit.MINUTES.toMillis(1));
+            out.println(Integer.valueOf(Configuration.get("cookie_lifetime_min")));
+
+            out.println(Cookies.hmCookieTime.keySet());
+
+
+
+
+
+
+            out.println("\n\n--------------- Users.registeredUsers ---------------");
             out.println(Users.registeredUsers.keySet());
+            out.println("Users.isRegisteredUser: "+Users.isRegisteredUser("l", "p"));
 
 
-        } catch (Exception e) {
-            err.println(e.getMessage());
-            e.printStackTrace();
+//            -------------
+            out.println("\n\n--------------- Properties ---------------");
+
+
         }
-//        finally {
-//            psql.closeConnection();
-//        }
+        catch (Exception e) { e.printStackTrace(); }
+        finally { psql.closeConnection(); }
     }
 
 
     // Класс-поток, можно указать интервал и число запусков
+    // Запуск:
+    // MyThread mt = new MyThread();
+    // Thread t = new Thread(mt);
+    // mt.is
     static class MyThread implements Runnable {
         long counterGlobal = 0; //общий счетчик итераций
         int limit;
-        int sleepTime;
+        long sleepTimeMS;
         boolean isInfinity = false;
 
+
         //бесконечное выполнение
-        MyThread(int sleepTime) {
-            this.sleepTime = sleepTime;
+        MyThread(long sleepTimeMilliseconds) {
+            this.sleepTimeMS = sleepTimeMilliseconds;
             this.isInfinity = true;
         }
 
         //выполняется 'limit'-раз
-        MyThread(int limit, int sleepTime) {
+        MyThread(int limit, int sleepTimeMilliseconds) {
             this.limit = limit;
-            this.sleepTime = sleepTime;
+            this.sleepTimeMS = sleepTimeMilliseconds;
         }
 
         public long getCounter() {
@@ -343,9 +322,9 @@ public class Main {
         public void run() {
             if (isInfinity) {
                 while (true) {
-                    out.println(">> the infinity thread <<");
+                    out.println("[infinity thread] ");
                     try {
-                        Thread.sleep(sleepTime);
+                        Thread.sleep(sleepTimeMS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -356,7 +335,7 @@ public class Main {
                 while (counter <= limit) {
                     out.println(">> " + counter + " <<");
                     try {
-                        Thread.sleep(sleepTime);
+                        Thread.sleep(sleepTimeMS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -365,6 +344,23 @@ public class Main {
                 counterGlobal++;
             }
 
+        }
+    }
+
+    public enum enumTimeExample{
+
+        MILLISECONDS(1),
+        SECONDS(1000),
+        MINUTES(60000),
+        HOURS(360000);
+        int time;
+
+        enumTimeExample(int time) {
+            this.time = time;
+        }
+
+        int get(int factor){
+            return factor * time;
         }
     }
 

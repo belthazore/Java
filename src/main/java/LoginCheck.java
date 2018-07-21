@@ -15,7 +15,7 @@ public class LoginCheck extends HttpServlet {
         StringBuilder PAGE = new StringBuilder();
 
 
-        PAGE.append("<br>is Registered USER!<br>");
+        PAGE.append("<br>is Registered LOGIN!<br>");
 
         response.getWriter().println(PAGE);
 

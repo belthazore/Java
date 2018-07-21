@@ -20,20 +20,34 @@ import java.util.Map;
 
 class Cookies {
 
-//    static ConcurrentHashMap<String, Long> zzz = new ConcurrentHashMap<>(1024);
-//    Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
-//    iter.hasn... не тянется :(
+//    private static ConcurrentHashMap<String, Long> zzz = new ConcurrentHashMap<>(1024);
+////    Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
+////    iter.hasn... не тянется :(
+//
+//    static void asd(){
+//        zzz.put("sadsad", 1L);
+//        zzz.put("sadsad2", 1L);
+//
+//        Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
+//        while(iter.hasNext()){
+//            Map.Entry<String, Long> e = iter.next();
+//            e.getValue();
+//            //iter.remove();
+//        }
+//    }
 
     static Map<String, Long> hmCookieTime =
             Collections.synchronizedMap(new HashMap<String, Long>(1024)); // ConcurrentHashMap
 
 
-    private static String COOKIE_NAME = "cookAuth";
-    private static int COOKIE_LIFETIME_MIN = 10; // то же время перезапуска потока автоудаления
-    jdbcPostgres psql = null;
+//    static String COOKIE_NAME = "cookAuth"; //TODO: rem after dbg
+    private static String COOKIE_NAME = Configuration.get("cookie_name");
+    private static int COOKIE_LIFETIME_MIN = Integer.valueOf(Configuration.get("cookie_lifetime_min")); // то же время перезапуска потока автоудаления
+//    private static int COOKIE_LIFETIME_MIN = 10; // то же время перезапуска потока автоудаления
 
 
     {
+        jdbcPostgres psql = null;
         //jdbc кеширование в HM кук(Str) и времени(Str) БД, таблицы cooks
         try {
             psql= new jdbcPostgres();
@@ -41,7 +55,7 @@ class Cookies {
 
             while (rsData.next()) {
                 String cook = rsData.getString(1);
-                long time = Long.parseLong(rsData.getString(2));
+                long time = Long.parseLong(rsData.getString(2)); //todo: integer in pgsql
                 hmCookieTime.put(cook, time);
             }
 
@@ -65,7 +79,6 @@ class Cookies {
 
         } catch (Exception e) { e.printStackTrace(); }
         finally { if (psql!=null) psql.closeConnection();}
-
     }
 
 
@@ -78,10 +91,12 @@ class Cookies {
     static void saveCookie(String cookie) {
         long timeNow = getTimeNow();
         hmCookieTime.put(cookie, timeNow); //put("DKVBJ3JH2B4JH24JB", "1529225995842")
-        new jdbcPostgres().execute2("INSERT INTO cooks(cookie, time) VALUES (?, ?) ON CONFLICT (cookie) DO UPDATE SET time = ?", new String[]{cookie, String.valueOf(timeNow), String.valueOf(timeNow)});
+        new jdbcPostgres().execute2(
+                "INSERT INTO cooks(cookie, time) VALUES (?, ?) ON CONFLICT (cookie) DO UPDATE SET time = ?",
+                new String[]{cookie, String.valueOf(timeNow), String.valueOf(timeNow)});
     }
 
-    static boolean isValidCookie(HttpServletRequest request) {
+    static boolean isValidCookie(HttpServletRequest request) { // boolean needUpdate
         boolean result = false;
         Cookie[] cookArr = request.getCookies();
         if (cookArr != null) {
@@ -123,7 +138,7 @@ class Cookies {
                                 hmCookieTime.remove(s);
 
                                 //из PG
-                                psql.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
+                                jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
                             }
                         }
                     }
@@ -134,8 +149,12 @@ class Cookies {
         };
     }
 
+    class MyThread extends Thread{
+        public void run(){
+        }
+    }
 
-    class TenMinutesThread implements Runnable {
+    class TenMinutesThread implements Runnable { //
 //                for (Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator(); iter.hasNext();) {
 //                    Map.Entry<String, Long> e = iter.next();
 //                    e.getValue();
@@ -157,7 +176,7 @@ class Cookies {
                             hmCookieTime.remove(s);
 
                             // из PG
-                            psql.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
+                            jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
                         }
                     }
 

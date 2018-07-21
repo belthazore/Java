@@ -2,7 +2,11 @@
 <html>
  <head>
   <meta charset="utf-8">
-  <title>Java Tomcat test server | Login</title>
+  <%
+  	String badResult = request.getParameter("badResult");
+  	String status = ( badResult==null ? "" : (badResult) );
+  %>
+  <title>Java Tomcat test server - Login <%= ("| "+status)%></title>
   <style><%@include file="/login.css"%></style>
 </head>
 
@@ -17,8 +21,7 @@
         <input  type="password" name="password" placeholder="password" /><br>
         <button type="submit"   style="border-radius: 3px;">Login</button>
           <!-- Если авторизация не успешна - сообщим -->
-        <% String badResult = request.getParameter("badResult"); %>
-        <p style="color: red"><%= ( badResult==null ? "" : ("<br>"+badResult) ) %></p>
+        <p style="color: red"><%= status %></p>
       </form>
     </div>
 

@@ -20,18 +20,18 @@ public class Gate extends HttpServlet {
 
         // переход с логином|паролем
         // Получим введенные данные
-        String loginCheck = request.getParameter("login");
-        String passwordCheck = request.getParameter("password");
+        String login    = request.getParameter("login");
+        String password = request.getParameter("password");
 
         // Если ничего не введено (null) или пустота - сохраним ее
-        String enteredLogin = loginCheck == null ? "" : loginCheck;
-        String enteredPassword = passwordCheck == null ? "" : passwordCheck;
+        boolean loginNotEmpty    = login != null;
+        boolean passwordNotEmpty = password != null;
 
 
 
 //        Переход с параметрами login/password (!=null)
-        if (loginCheck != null & passwordCheck != null) {
-            if (Users.isRegisteredUser(enteredLogin, enteredPassword)) {
+        if (loginNotEmpty & passwordNotEmpty) {
+            if (Users.isRegisteredUser(login, password)) {
                 Cookie cook = Cookies.getNewCookie();
                 response.addCookie(cook);
                 Cookies.saveCookie(cook.getValue()); // сохраним в HM и PSQL новую куку с текущим временем(long)

@@ -41,6 +41,9 @@
                             <!-- this is relative to the pom.xml directory -->
                             <directory>resources</directory>
                         </resource>
+                        <resource>
+                            <directory>conf</directory>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>
@@ -57,7 +60,9 @@
                 <artifactId>tomcat8-maven-plugin</artifactId>
                 <version>3.0-r1655215</version>
                 <configuration>
-                    <server>tomcat-server</server>
+                    <server>TomcatServer</server>
+                    <username>admin</username>
+                    <password>admin</password>
                     <url>http://localhost:8080/manager/text</url>
                     <warFile>target/${project.artifactId}-${project.version}.${project.packaging}</warFile>
                     <!--Bad desission: <warFile>target/project-1.0.war</warFile> -->

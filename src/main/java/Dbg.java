@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -14,11 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 public class Dbg extends HttpServlet {
 
     private static Map <String, Long> HASHMAP = new HashMap<String, Long>();
-    private static Map <String, String> hmResult = new HashMap<String, String>(); //ключ= модуль страницы, прим. 'MD5', значение=String с '<br>' тэгами
+    private static Map <String, String> hmResult = new HashMap<String, String>(); //ключ= модуль страницы,
+    // прим. 'MD5', значение=String с '<br>' тэгами
 
     private Cookie[] COOKIE_ARR;
     private long TIME_NOW_MINUTE = (System.currentTimeMillis()/1000)/60;
@@ -42,14 +41,19 @@ public class Dbg extends HttpServlet {
 
         pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br><br>");
 
+        pageBody.append("0. Configuration.get(\"db_driver\"): "+Configuration.get("db_driver")+"<br><br>");
         pageBody.append("1. Cookies in PSQL:<br>"+Cookies.hmCookieTime.keySet()+"<br><br>");
-        pageBody.append("1.1 Diffs time savings:<br>");
-        Collection<Long> arr = Cookies.hmCookieTime.values();
-        for (long timeSave :arr) {
-            float diffMinutes = (Cookies.getTimeNow() - timeSave)/60000;
-            pageBody.append(timeSave+ ": " + diffMinutes+"<br>");
+
+        if (!Cookies.hmCookieTime.isEmpty()){
+            pageBody.append("1.1 Diffs time savings: ");
+            Collection<Long> arr = Cookies.hmCookieTime.values();
+            for (long timeSave :arr) {
+                float diffMinutes = (Cookies.getTimeNow() - timeSave)/60000;
+                pageBody.append(timeSave+ ": " + diffMinutes+"<br>");
+            }
+            pageBody.append("<br><br>");
         }
-        pageBody.append("<br><br>");
+
         pageBody.append("2. Registered users in PSQL:<br>"+Users.registeredUsers.keySet()+"<br><br>");
 
 
@@ -57,78 +61,6 @@ public class Dbg extends HttpServlet {
         pageBody.append("<getFormAuthorization action=\"" + ACTION_URL + "\">");
         pageBody.append(new SimpleDateFormat("HH:mm:ss").format(dateNow)).append(
                 "<br>" + new SimpleDateFormat("dd-MM-yyyy").format(dateNow) + "<br><br>");
-
-
-
-
-        // JDBC
-        if (validCookie(request)) {
-            pageBody.append("SUCCESS LOGINED<br>");
-
-            HASHMAP.put(COOKIE_CURRENT_STR, TIME_NOW_MINUTE);
-            //Обновим время в бд если прошло >15 и <30 минут
-            String cookFromRequest = String.valueOf(COOKIE_ARR[0].getValue()); //TODO может вызвать Exception
-            pageBody.append("<br>1. cookFromRequest: "+cookFromRequest);
-            pageBody.append("<br>2. get timeSave by key 'cookie': "+HASHMAP.get(COOKIE_CURRENT_STR));
-//          pageBody.append("<br>3. Diff: "+ ((System.currentTimeMillis()/1000/60) - HASHMAP.get(COOKIE_CURRENT_STR)));
-            pageBody.append("<br>3. Diff: timeNow - timeSave = "+ ( ((System.currentTimeMillis()/1000/60)+5 ) - HASHMAP.get(COOKIE_CURRENT_STR)) + "<br>");
-
-            try {
-                String lg = request.getParameter("login2");
-                HASHMAP.put(lg, 23212424L);
-                pageBody.append("HASHMAP.get(\"key\"): " + HASHMAP.get(lg) + "<br><br><br>");
-            }catch (Exception ignored){
-            }
-
-            jdbcPostgres db = new jdbcPostgres();
-            ResultSet rs;
-            int column = 0;
-
-
-
-        } else {
-            pageBody.append("NOT LOGINED<br>");
-            try {
-                if (
-                        (
-                                (request.getParameter("login").isEmpty() || request.getParameter("password").isEmpty())
-                                        ||
-                                        (request.getParameter("login") == null || request.getParameter("password") == null)
-                        )
-                        ) {
-                    pageBody.append("<input type=\"text\" name=\"login\" value=\"LoginOld\"><br>");
-                    pageBody.append("<input type=\"password\" name=\"password\" value=\"Password\"><br>");
-                    pageBody.append("<input type=\"submit\" value=\"LoginOld\">");
-                } else {
-                    LOGIN_ENTERED = request.getParameter("login");
-                    PASSWORD_ENTERED = request.getParameter("password");
-                    String stringForHashMD5 = LOGIN_ENTERED + PASSWORD_ENTERED + new Date();
-                    String cookHashMD5 = getMD5(stringForHashMD5);
-
-
-                    Cookie cook = new Cookie("cook", cookHashMD5);
-                    cook.setMaxAge(COOKIE_MAX_AGE); // in seconds 30 min
-                    response.addCookie(cook);
-
-
-
-                    pageBody.append(
-                            "login: " + LOGIN_ENTERED +
-                                    "<br>password: " + PASSWORD_ENTERED + "<br>" +
-                                    stringForHashMD5 + ": " + cookHashMD5
-                    );
-                }
-            } catch (NullPointerException e) { // не удалось выполнить request.getParameter("login").isEmpty()
-                pageBody.append("Exception when try check login&password:<br>" + e.toString() + "<br><br>");
-                pageBody.append("<input type=\"text\" name=\"login\" value=\"LoginOld\"><br>");
-                pageBody.append("<input type=\"password\" name=\"password\" value=\"Password\"><br>");
-                pageBody.append("<input type=\"submit\" value=\"LoginOld\">");
-            }
-        }
-
-
-
-
 
 
 
