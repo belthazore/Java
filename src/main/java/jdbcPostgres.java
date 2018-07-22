@@ -3,23 +3,6 @@ import java.sql.*;
 
 class jdbcPostgres{
     //  Database settings
-////    private static final String DB_DRIVER = "org.postgresql.Driver";
-//    private static String DB_DRIVER = Configuration.get("db_driver");
-//    private static String DB_ROOT_URL = Configuration.get("db_root_url");
-//    private static String DB_DEV = Configuration.get("db_dev");
-//
-//    private static String DB_URL = DB_ROOT_URL + DB_DEV;
-//
-//    // TODO вычитывать из конфига
-//    private static String LOGIN = Configuration.get("login");
-//    private static String PASSWORD = Configuration.get("password");
-
-
-
-
-
-
-
     private  String DB_DRIVER;
     private  String DB_ROOT_URL;
     private  String DB_DEV;
@@ -27,7 +10,17 @@ class jdbcPostgres{
     private  String LOGIN;
     private  String PASSWORD;
 
-    private Connection connection;
+//    DB_DRIVER = "org.postgresql.Driver";
+//    DB_ROOT_URL = "jdbc:postgresql://127.0.0.1:5432/";
+//    DB_DEV = "test_igor";
+//    DB_URL = DB_ROOT_URL + DB_DEV;
+//
+//    LOGIN = "postgres";
+//    PASSWORD = "postgres";
+
+
+
+    private static Connection connection;
     private Statement statement = null;
 
 
@@ -40,14 +33,6 @@ class jdbcPostgres{
         LOGIN = Configuration.get("login");
         PASSWORD = Configuration.get("password");
 
-//        DB_DRIVER = "org.postgresql.Driver";
-//        DB_ROOT_URL = "jdbc:postgresql://127.0.0.1:5432/";
-//        DB_DEV = "test_igor";
-//        DB_URL = DB_ROOT_URL + DB_DEV;
-//
-//        LOGIN = "postgres";
-//        PASSWORD = "postgres";
-
         try {
             Class.forName(DB_DRIVER);
             connection = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
@@ -55,18 +40,21 @@ class jdbcPostgres{
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-//        finally { // ResultSet-ы возвращают null постоянно
-//            Enumeration<Driver> drivers = DriverManager.getDrivers();
-//            while (drivers.hasMoreElements()) {
-//                Driver driver = drivers.nextElement();
-//                try {
-//                    DriverManager.deregisterDriver(driver);
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
+        /**
+        finally { // ResultSet-ы возвращают null постоянно
+            Enumeration<Driver> drivers = DriverManager.getDrivers();
+            while (drivers.hasMoreElements()) {
+                Driver driver = drivers.nextElement();
+                try {
+                    DriverManager.deregisterDriver(driver);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        */
     }
+
 
 
     static void execute2(String QUERY, String[] params) {
@@ -84,7 +72,7 @@ class jdbcPostgres{
         }
     }
 
-
+    // Для операций SELECT
     ResultSet execute(String QUERY) {
         try {
             return statement.executeQuery(QUERY);

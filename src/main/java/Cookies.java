@@ -1,10 +1,8 @@
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.ResultSet;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 // Вопрос
 // 1. jdbcPostgres дергать лучше через статику или через экземплар
@@ -14,36 +12,38 @@ import java.util.Map;
  * Менеджер Cookie-s
  * Действия:
  * 1. Автоудаление просроченных кук из БД и HM(время жизни более 15*-ти минут)
- * 2. Создание кук
- * ?3. Расчет временной разницы в секундах и минутах
+ * 2. Создание кукы
+ * 3. Расчет временной разницы в секундах и минутах
  **/
 
 class Cookies {
 
-//    private static ConcurrentHashMap<String, Long> zzz = new ConcurrentHashMap<>(1024);
-////    Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
-////    iter.hasn... не тянется :(
-//
-//    static void asd(){
-//        zzz.put("sadsad", 1L);
-//        zzz.put("sadsad2", 1L);
-//
-//        Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
-//        while(iter.hasNext()){
-//            Map.Entry<String, Long> e = iter.next();
-//            e.getValue();
-//            //iter.remove();
-//        }
-//    }
+//    Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
+//    iter.hasn... не тянется :(
+
+    private static ConcurrentHashMap<String, Long> zzz = new ConcurrentHashMap<>(1024);
+
+    static void asd(){
+        zzz.put("sadsad", 1L);
+        zzz.put("sadsad2", 1L);
+
+        Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
+        while(iter.hasNext()){
+            Map.Entry<String, Long> e = iter.next();
+            e.getValue();
+            //iter.remove();
+        }
+    }
 
     static Map<String, Long> hmCookieTime =
             Collections.synchronizedMap(new HashMap<String, Long>(1024)); // ConcurrentHashMap
 
 
-//    static String COOKIE_NAME = "cookAuth"; //TODO: rem after dbg
     private static String COOKIE_NAME = Configuration.get("cookie_name");
-    private static int COOKIE_LIFETIME_MIN = Integer.valueOf(Configuration.get("cookie_lifetime_min")); // то же время перезапуска потока автоудаления
-//    private static int COOKIE_LIFETIME_MIN = 10; // то же время перезапуска потока автоудаления
+    private static int COOKIE_LIFETIME_MIN =
+            // то же время перезапуска потока автоудаления
+            Integer.valueOf(Configuration.get("cookie_lifetime_min"));
+
 
 
     {
@@ -52,11 +52,11 @@ class Cookies {
         try {
             psql= new jdbcPostgres();
             ResultSet rsData = psql.execute("SELECT * FROM cooks");
-
             while (rsData.next()) {
                 String cook = rsData.getString(1);
                 long time = Long.parseLong(rsData.getString(2)); //todo: integer in pgsql
-                hmCookieTime.put(cook, time);
+//                hmCookieTime.put(cook, time); // закешируем сохраненные куки/время сохранения
+                zzz.put(cook, time);
             }
 
             // Старт автоочистки кук старше 10 минут
@@ -64,7 +64,7 @@ class Cookies {
             // 1. Thread
             // Вешает Tomcat (исправлено)
             //
-            TenMinutesThread tmt = new TenMinutesThread();
+            TenMinutesRunnable tmt = new TenMinutesRunnable();
             Thread thr = new Thread(tmt);
             thr.setDaemon(true);
             thr.start();
@@ -91,7 +91,7 @@ class Cookies {
     static void saveCookie(String cookie) {
         long timeNow = getTimeNow();
         hmCookieTime.put(cookie, timeNow); //put("DKVBJ3JH2B4JH24JB", "1529225995842")
-        new jdbcPostgres().execute2(
+        jdbcPostgres.execute2(
                 "INSERT INTO cooks(cookie, time) VALUES (?, ?) ON CONFLICT (cookie) DO UPDATE SET time = ?",
                 new String[]{cookie, String.valueOf(timeNow), String.valueOf(timeNow)});
     }
@@ -149,12 +149,39 @@ class Cookies {
         };
     }
 
-    class MyThread extends Thread{
+    class AutocleanerThread extends Thread{
         public void run(){
+            while (true) {
+                try {
+                    String[] arr = hmCookieTime.keySet().toArray(new String[]{}); // Collection become arr =["key-0","key-N"]
+                    long timeNow = getTimeNow();
+                    for (String s : arr) {
+                        long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
+                        float diffMinutes = (float) (timeNow - timeSaveCook) / 60000; // конвертируем разницу времен в минуты
+                        //TODO: need realize writing to log
+                        //Удаление если возраст куки более 'COOKIE_LIFETIME_MIN' минут
+                        if (diffMinutes > COOKIE_LIFETIME_MIN) {
+
+                            // из HM
+                            hmCookieTime.remove(s);
+
+                            // из PG
+                            jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
+                        }
+                    }
+
+                }
+                catch (Exception e) { e.printStackTrace(); }
+                finally {
+                    try {
+                        Thread.sleep(60000*COOKIE_LIFETIME_MIN);
+                    } catch (InterruptedException e) { e.printStackTrace(); }
+                }
+            }
         }
     }
 
-    class TenMinutesThread implements Runnable { //
+    class TenMinutesRunnable implements Runnable { //
 //                for (Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator(); iter.hasNext();) {
 //                    Map.Entry<String, Long> e = iter.next();
 //                    e.getValue();

@@ -8,6 +8,8 @@ public class Configuration {
 
     private static Properties prop = new Properties();
     private static InputStream input;
+    private static InputStream inputDbg;
+    static String err;
 
 
     static {
@@ -15,9 +17,13 @@ public class Configuration {
             input = new FileInputStream("//opt//tomcat//webapps//project//db.conf");
             // load a properties file
             prop.load(input);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.getStackTrace(); }
+
+        //DBG, remove
+        try {
+            inputDbg = new FileInputStream("..//..//db.conf");
+            prop.load(input);
+        } catch (Exception e) { err=e.getMessage(); }
     }
 
     static String get(String name) {

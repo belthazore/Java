@@ -136,7 +136,7 @@ public class Main {
 
             out.println("\n-- Thread example --");
 
-//            TenMinutesThread tmt = new TenMinutesThread();
+//            TenMinutesRunnable tmt = new TenMinutesRunnable();
 //            Thread thr = new Thread(tmt);
 //            thr.start();
 
