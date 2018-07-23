@@ -1,11 +1,9 @@
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -24,21 +22,21 @@ public class Main {
 
     static Map<String, Long> hmCookieTime =
             Collections.synchronizedMap(new HashMap<String, Long>());
-    static jdbcPostgres psql = new jdbcPostgres();
+//    static jdbcPostgres psql = new jdbcPostgres();
 
 
     public static void main(String[] args) {
         try {
-            out.println("\n 1. PGSQL testing Select queryes");
-            ResultSet rsForCC = psql.execute("select * from users"); // для получения количеста колонок
-            out.println("Column count = " + rsForCC.getMetaData().getColumnCount());
-
-            ResultSet rsForRC = psql.execute("select count(*) from users"); // для получения количеста записей
-            rsForRC.next();
-            out.println("Row count = " + rsForRC.getString(1));
-
-            ResultSet rs = psql.execute("SELECT * from users where login='first'");
-            out.println("In search by login \"first\" result rows: " + psql.getRowCount(rs));
+//            out.println("\n 1. PGSQL testing Select queryes");
+//            ResultSet rsForCC = psql.execute("select * from users"); // для получения количеста колонок
+//            out.println("Column count = " + rsForCC.getMetaData().getColumnCount());
+//
+//            ResultSet rsForRC = psql.execute("select count(*) from users"); // для получения количеста записей
+//            rsForRC.next();
+//            out.println("Row count = " + rsForRC.getString(1));
+//
+//            ResultSet rs = psql.execute("SELECT * from users where login='first'");
+//            out.println("In search by login \"first\" result rows: " + psql.getRowCount(rs));
 
 
 
@@ -79,13 +77,12 @@ public class Main {
 
             // 02. поиск (ХЗ)
             String QUERY_SELECT_ONE = "SELECT * FROM cooks WHERE cookie='cook_test'";
-            ResultSet rsSelectOne = psql.execute(QUERY_SELECT_ONE);
 //            out.println(QUERY_SELECT_ONE + ":\n" + psql.getRowCount(rsSelectOne));
 
 
             // 03. Удаление
             String QUERY_RM_ONE = "DELETE FROM cooks WHERE cookie='cook_test777'";
-            psql.execute(QUERY_RM_ONE); // "Запрос не вернул результата"
+//            psql.execute(QUERY_RM_ONE); // "Запрос не вернул результата"
             out.println("\n" + QUERY_RM_ONE + ":\n" + "");
 
 
@@ -140,23 +137,13 @@ public class Main {
 //            Thread thr = new Thread(tmt);
 //            thr.start();
 
-            out.println("\n-- File write example (for Logs) --");
-            String textForWrite = "192.168.0.1\n" + "192.168.0.5\n";
-            try {
-                Files.write(Paths.get("//home//nnm//test.log"), textForWrite.getBytes(), StandardOpenOption.CREATE);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            File file = new File("//home//nnm//.android");
-            out.println("Are //home//nnm//.android exist? \n" + file.exists() + "\n");
-            out.println("Are home/nnm contains \".android\" folder:\n" + Arrays.asList(new File("//home//nnm//").list()).contains(".android") + "\n");
 //            out.println(Arrays.toString(str[5]));
 
 //            out.println("KS: "+ Cookies.hmCookieTime.keySet());
 
-            ResultSet rsUser = psql.execute("SELECT * FROM users WHERE login='l' AND password='p'");
-            rsUser.next();
-            out.println("rsUser.getString: " + rsUser.getString(3)); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
+//            ResultSet rsUser = psql.execute("SELECT * FROM users WHERE login='l' AND password='p'");
+//            rsUser.next();
+//            out.println("rsUser.getString: " + rsUser.getString(3)); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
 
 
             out.println("\n\n\n- - - - - - - - - - - - - - - - - - - - - - - - ");
@@ -242,16 +229,16 @@ public class Main {
             }
 
             out.println("\n\n--------------- Postgres Test ---------------");
-            ResultSet rsUsers = psql.execute("SELECT * FROM users");
-            try {
-                if (rsUsers!=null) {
-                    while (rsUsers.next()) {
-                        out.println(rsUsers.getString("login") + ": " + rsUsers.getString("password"));
-                    }
-                }
-            }
-            catch (Exception e) { e.printStackTrace(); }
-            finally { psql.closeConnection(); }
+//            ResultSet rsUsers = psql.execute("SELECT * FROM users");
+//            try {
+//                if (rsUsers!=null) {
+//                    while (rsUsers.next()) {
+//                        out.println(rsUsers.getString("login") + ": " + rsUsers.getString("password"));
+//                    }
+//                }
+//            }
+//            catch (Exception e) { e.printStackTrace(); }
+//            finally { psql.closeConnection(); }
 
 
 
@@ -267,7 +254,7 @@ public class Main {
 //             out.println(MyThread.sleepTime.MILLISECONDS);
             out.println(enumTimeExample.MINUTES.get(1));
             out.println(TimeUnit.MINUTES.toMillis(1));
-            out.println(Integer.valueOf(Configuration.get("cookie_lifetime_min")));
+//            out.println(Integer.valueOf(Configuration.get("cookie_lifetime_min")));
 
             out.println(Cookies.hmCookieTime.keySet());
 
@@ -282,12 +269,25 @@ public class Main {
 
 
 //            -------------
-            out.println("\n\n--------------- Properties ---------------");
+
+            // get time
+            out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()));
+
+
+            out.println("\n\n--------------- Logs ---------------");
+            String textForWrite = "192.168.0.1\n" + "192.168.0.2\n";
+            try {
+                Files.write(Paths.get(
+                        "//home//nnm//test.log"), textForWrite.getBytes(), StandardOpenOption.APPEND);
+            } catch (IOException e) { e.printStackTrace(); }
+//            File file = new File("//home//nnm//.android");
+//            out.println("Are //home//nnm//.android exist? \n" + file.exists() + "\n");
+//            out.println("Are home/nnm contains \".android\" folder:\n" + Arrays.asList(new File("//home//nnm//").list()).contains(".android") + "\n");
 
 
         }
         catch (Exception e) { e.printStackTrace(); }
-        finally { psql.closeConnection(); }
+//        finally { psql.closeConnection(); }
     }
 
 
@@ -400,7 +400,7 @@ public class Main {
                             //из HM
                             hmCookieTime.remove(s);
                             //из PG
-                            psql.execute("DELETE FROM cooks WHERE cookie='" + s + "'");
+//                            psql.execute("DELETE FROM cooks WHERE cookie='" + s + "'");
                         }
                     }
                     out.println("\n");
@@ -408,7 +408,7 @@ public class Main {
                 }
             } catch (Exception ignored) {
             } finally {
-                psql.closeConnection();
+//                psql.closeConnection();
             }
         }
     }
