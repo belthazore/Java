@@ -41,7 +41,7 @@ public class Dbg extends HttpServlet {
 
         pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br><br>");
 
-        pageBody.append("0. Configuration.get(\"db_driver\"): "+Configuration.get("db_driver")+"<br>"+Configuration.err+"<br>");
+        pageBody.append("0. Configuration.get(\"db_driver\"): "+Configuration.get("db_driver")+"<br>");
         pageBody.append("1. Cookies in PSQL:<br>"+Cookies.hmCookieTime.keySet()+"<br><br>");
 
         if (!Cookies.hmCookieTime.isEmpty()){
@@ -132,6 +132,9 @@ public class Dbg extends HttpServlet {
         );
         pageBody.append("validCookie(request): " + validCookie(request));
         pageBody.append("<br> HashMe.getMD5(\"test\"): " + getMD5("test") + "</getFormAuthorization>");
+
+        Log.writeError("jdbcPostgres: test");
+
 
 
 

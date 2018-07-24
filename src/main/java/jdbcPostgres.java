@@ -2,6 +2,7 @@ import java.sql.*;
 
 
 class jdbcPostgres{
+
     //  Database settings
     private  String DB_DRIVER;
     private  String DB_ROOT_URL;
@@ -38,6 +39,7 @@ class jdbcPostgres{
             connection = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
             statement = connection.createStatement();
         } catch (SQLException | ClassNotFoundException e) {
+            Log.writeError("jdbcPostgres: " + e.getMessage());
             e.printStackTrace();
         }
         /**
