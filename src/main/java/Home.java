@@ -24,6 +24,8 @@ public class Home extends HttpServlet {
             response.sendRedirect("/project/login");
         }
 
+        // Запишем успешную авторизацию
+        Log.writeTransition("Home.Logined with cookie success", request);
 
         // T ODO: 1. добавить проверку куки, если ее нет или она не валидна - редирект на /login
         // T ODO: 2. имя юзера брать с cookie [] по ключу user(? или брать куку, по ней в HM находить user)

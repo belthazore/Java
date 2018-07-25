@@ -6,11 +6,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import static java.lang.System.err;
 import static java.lang.System.out;
@@ -20,9 +17,10 @@ import static java.lang.Thread.sleep;
 
 public class Main {
 
-    static Map<String, Long> hmCookieTime =
-            Collections.synchronizedMap(new HashMap<String, Long>());
-//    static jdbcPostgres psql = new jdbcPostgres();
+    private static Map<String, Long> hmCookieTime =
+            Collections.synchronizedMap(new HashMap<>());
+
+    private static ConcurrentHashMap<String, Long> hm;
 
 
     public static void main(String[] args) {
@@ -37,7 +35,6 @@ public class Main {
 //
 //            ResultSet rs = psql.execute("SELECT * from users where login='first'");
 //            out.println("In search by login \"first\" result rows: " + psql.getRowCount(rs));
-
 
 
             out.println("DONE");
@@ -86,7 +83,6 @@ public class Main {
             out.println("\n" + QUERY_RM_ONE + ":\n" + "");
 
 
-
             out.println();
             //Проверка и удаление элементов HM
             //timeNow уже выше определялось
@@ -94,8 +90,8 @@ public class Main {
             /**
 
              for (String s : arr){
-             long timeSaveCook = hmCookieTime.get(s); //берем время куки(String) из HM >> в long
-             long diff = timeNow-timeSaveCook;
+             long cookieSaveTime = hmCookieTime.get(s); //берем время куки(String) из HM >> в long
+             long diff = timeNow-cookieSaveTime;
              float diffSec = (float) (diff/1000);
              float diffMin = diffSec/60;
              boolean needRemove = (diffMin>10);
@@ -112,17 +108,17 @@ public class Main {
              // После
              out.println(hmCookieTime.keySet());
              */
-            Logger logger = Logger.getLogger(Main.class.getName());
-            FileHandler fh = new FileHandler("loggerExample.log", false);
-            fh.setLevel(Level.FINE);
-
-            Logger l = Logger.getLogger("");
-            fh.setFormatter(new SimpleFormatter());
-            l.addHandler(fh);
-            l.setLevel(Level.CONFIG);
-            logger.log(Level.INFO, "message 1");
-            logger.log(Level.SEVERE, "message 2");
-            logger.log(Level.FINE, "message 3");
+//            Logger logger = Logger.getLogger(Main.class.getName());
+//            FileHandler fh = new FileHandler("loggerExample.log", false);
+//            fh.setLevel(Level.FINE);
+//
+//            Logger l = Logger.getLogger("");
+//            fh.setFormatter(new SimpleFormatter());
+//            l.addHandler(fh);
+//            l.setLevel(Level.CONFIG);
+//            logger.log(Level.INFO, "message 1");
+//            logger.log(Level.SEVERE, "message 2");
+//            logger.log(Level.FINE, "message 3");
 
 //            LOGGER.addHandler(fh);
 //            LOGGER.log( Level.FINE, "processing entries in loop");
@@ -130,6 +126,8 @@ public class Main {
 
 
 //            psql.execute3("DELETE FROM cooks WHERE cookie='$0'", new String[]{"cook2"}); // Не пашет :(
+
+
 
             out.println("\n-- Thread example --");
 
@@ -241,9 +239,6 @@ public class Main {
 //            finally { psql.closeConnection(); }
 
 
-
-
-
             out.println("\n\n--------------- Thread and TimeUnit Test ---------------");
             // Запуск:
             MyThread mt = new MyThread(TimeUnit.MINUTES.toMillis(1));
@@ -251,21 +246,13 @@ public class Main {
             thread.setDaemon(true);
 //             thread.run();
 
-//             out.println(MyThread.sleepTime.MILLISECONDS);
-            out.println(enumTimeExample.MINUTES.get(1));
-            out.println(TimeUnit.MINUTES.toMillis(1));
-//            out.println(Integer.valueOf(Configuration.get("cookie_lifetime_min")));
-
-            out.println(Cookies.hmCookieTime.keySet());
-
-
-
-
+//            TODO: uncomment
+//            out.println(Cookies.hmCookieTime.keySet());
 
 
             out.println("\n\n--------------- Users.registeredUsers ---------------");
-            out.println(Users.registeredUsers.keySet());
-            out.println("Users.isRegisteredUser: "+Users.isRegisteredUser("l", "p"));
+//            out.println(Users.registeredUsers.keySet()); // TODO: uncomment
+//            out.println("Users.isRegisteredUser: "+Users.isRegisteredUser("l", "p"));  // TODO: uncomment
 
 
 //            -------------
@@ -279,90 +266,187 @@ public class Main {
             try {
                 Files.write(Paths.get(
                         "//home//nnm//test.log"), textForWrite.getBytes(), StandardOpenOption.APPEND);
-            } catch (IOException e) { e.printStackTrace(); }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 //            File file = new File("//home//nnm//.android");
 //            out.println("Are //home//nnm//.android exist? \n" + file.exists() + "\n");
 //            out.println("Are home/nnm contains \".android\" folder:\n" + Arrays.asList(new File("//home//nnm//").list()).contains(".android") + "\n");
 
 
+            out.println("\n\n--------------- Thread Autoclean w iterator ---------------");
+
+            hm = new ConcurrentHashMap<>(1024);
+
+            hm.put("k0", 1532531226359L);
+            hm.put("k1", 1532531126359L);
+
+
+            // для проверки и удаления кук из HM и Postgres
+            out.println("UNTIL: " + hm.keySet());
+
+            // Старт потока авточистки с перезапуском
+            AutoCleanCooksThread2 act = new AutoCleanCooksThread2();
+            act.setDaemon(true);
+            act.run();
+
+
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e) { e.printStackTrace(); }
-//        finally { psql.closeConnection(); }
+    }
+
+    //
+//                while (hmIter.hasNext()) {
+//        Map.Entry<String, Long> hmEntry = hmIter.next();
+//        long cookieSaveTime = hmEntry.getValue(); //берем время сохранения куки из HM
+//        float diffMinutes = (float) (Cookies.getTimeNow() - cookieSaveTime) / 60000; // конвертируем разницу времен в минуты
+//        out.println("Cook " + hmEntry.getKey() + " age: " +        // TODO: Remove after debug
+//                diffMinutes + " minute");
+//
+//        //Удаление если возраст куки более 'COOKIE_LIFETIME_MIN' минут
+//        if (diffMinutes > COOKIE_LIFETIME_MIN) {
+//            out.println(diffMinutes + " > " + COOKIE_LIFETIME_MIN); // TODO: Remove after debug
+//
+//            // из HM
+//            hmIter.remove();
+//
+//            //ИЗ БД
+//            //TODO !
+//
+//        }
+//
+//        try {
+//            Thread.sleep(TimeUnit.MINUTES.toMillis(COOKIE_LIFETIME_MIN));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+
+    static class AutoCleanCooksThread2 extends Thread {
+        String cookie;
+        long cookieSaveTime;
+        int COOKIE_LIFETIME_MIN = 1;
+        int countThreadStarts = 0;
+
+        public void run() {
+
+            out.println("Thread START ...");
+            while (true) {
+                try {
+                    countThreadStarts++;
+                    out.println("start: " + countThreadStarts + " thread");
+                    Iterator<Map.Entry<String, Long>> hmIterator = hm.entrySet().iterator();
+                    while (hmIterator.hasNext()) {
+                        Map.Entry<String, Long> hmEntry = hmIterator.next();
+                        cookie = hmEntry.getKey();
+                        cookieSaveTime = hmEntry.getValue(); // получим время сохранения куки из HM
+                        float diffMinutes = (float) (System.currentTimeMillis() - cookieSaveTime) / 60000; // конвертируем разницу времен в минуты
+
+                        out.println("Cook " + hmEntry.getKey() + " age: " +        // TODO: Remove after debug
+                                diffMinutes + " minute");
+
+
+                        //Удаление если возраст куки более 'COOKIE_LIFETIME_MIN' минут
+                        if (diffMinutes > COOKIE_LIFETIME_MIN) {
+                            out.println(diffMinutes + " > " + COOKIE_LIFETIME_MIN); // TODO: Remove after debug
+
+                            hmIterator.remove(); // из HM
+
+//                        jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{cookie}); //ИЗ БД
+                        }
+                    }
+
+                } catch (Exception e) { e.printStackTrace(); }
+
+                try {
+                    out.println("I`m sleeping...");
+                    Thread.sleep(60000 * COOKIE_LIFETIME_MIN);
+                } catch (InterruptedException e) { e.printStackTrace(); }
+
+                out.println("AFTER: " + hm.keySet());
+            }
+        }
     }
 
 
-    // Класс-поток, можно указать интервал и число запусков
-    // Запуск:
-    // MyThread mt = new MyThread();
-    // Thread t = new Thread(mt);
-    // mt.is
-    static class MyThread implements Runnable {
-        long counterGlobal = 0; //общий счетчик итераций
-        int limit;
-        long sleepTimeMS;
-        boolean isInfinity = false;
+
+// Класс-поток, можно указать интервал и число запусков
+// Запуск:
+// MyThread mt = new MyThread();
+// Thread t = new Thread(mt);
+// mt.is
+static class MyThread implements Runnable {
+    long counterGlobal = 0; //общий счетчик итераций
+    int limit;
+    long sleepTimeMS;
+    boolean isInfinity = false;
 
 
-        //бесконечное выполнение
-        MyThread(long sleepTimeMilliseconds) {
-            this.sleepTimeMS = sleepTimeMilliseconds;
-            this.isInfinity = true;
-        }
+    //бесконечное выполнение
+    MyThread(long sleepTimeMilliseconds) {
+        this.sleepTimeMS = sleepTimeMilliseconds;
+        this.isInfinity = true;
+    }
 
-        //выполняется 'limit'-раз
-        MyThread(int limit, int sleepTimeMilliseconds) {
-            this.limit = limit;
-            this.sleepTimeMS = sleepTimeMilliseconds;
-        }
+    //выполняется 'limit'-раз
+    MyThread(int limit, int sleepTimeMilliseconds) {
+        this.limit = limit;
+        this.sleepTimeMS = sleepTimeMilliseconds;
+    }
 
-        public long getCounter() {
-            return counterGlobal;
-        }
+    public long getCounter() {
+        return counterGlobal;
+    }
 
-        public void run() {
-            if (isInfinity) {
-                while (true) {
-                    out.println("[infinity thread] ");
-                    try {
-                        Thread.sleep(sleepTimeMS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    counterGlobal++;
-                }
-            } else {
-                int counter = 0;
-                while (counter <= limit) {
-                    out.println(">> " + counter + " <<");
-                    try {
-                        Thread.sleep(sleepTimeMS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    counter++;
+    public void run() {
+        if (isInfinity) {
+            while (true) {
+                out.println("[infinity thread] ");
+                try {
+                    Thread.sleep(sleepTimeMS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 counterGlobal++;
             }
-
+        } else {
+            int counter = 0;
+            while (counter <= limit) {
+                out.println(">> " + counter + " <<");
+                try {
+                    Thread.sleep(sleepTimeMS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                counter++;
+            }
+            counterGlobal++;
         }
+
+    }
+}
+
+public enum enumTimeExample {
+
+    MILLISECONDS(1),
+    SECONDS(1000),
+    MINUTES(60000),
+    HOURS(360000);
+    int time;
+
+    enumTimeExample(int time) {
+        this.time = time;
     }
 
-    public enum enumTimeExample{
-
-        MILLISECONDS(1),
-        SECONDS(1000),
-        MINUTES(60000),
-        HOURS(360000);
-        int time;
-
-        enumTimeExample(int time) {
-            this.time = time;
-        }
-
-        int get(int factor){
-            return factor * time;
-        }
+    int get(int factor) {
+        return factor * time;
     }
+}
 
     private static float diffSeconds(long from, long to) {
         return (to - from) / 1000;
@@ -376,40 +460,40 @@ public class Main {
         return System.currentTimeMillis();
     }
 
-    static class TenMinutesThread implements Runnable {
-        public void run() {
-            try {
-                while (true) {
-                    err.println("3sec >>");
-                    try {
-                        sleep(3000); //60000*10 минут 10
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    err.println("3sec <<");
-
-                    String[] arr = hmCookieTime.keySet().toArray(new String[0]); //arr become =["key-0","key-N"]
-                    out.println(hmCookieTime.keySet());
-                    for (String s : arr) {
-                        long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
-                        float diffMinutes = (float) (getTimeNow() - timeSaveCook) / 60000;
-                        //TODO: need realize writing to log
-                        //Удаление если возраст куки более 10ти минут
-                        if (diffMinutes > 10) {
-                            out.println("REMOVING: " + s);
-                            //из HM
-                            hmCookieTime.remove(s);
-                            //из PG
-//                            psql.execute("DELETE FROM cooks WHERE cookie='" + s + "'");
-                        }
-                    }
-                    out.println("\n");
-                    new Main();
+static class TenMinutesThread implements Runnable {
+    public void run() {
+        try {
+            while (true) {
+                err.println("3sec >>");
+                try {
+                    sleep(3000); //60000*10 минут 10
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception ignored) {
-            } finally {
-//                psql.closeConnection();
+                err.println("3sec <<");
+
+                String[] arr = hmCookieTime.keySet().toArray(new String[0]); //arr become =["key-0","key-N"]
+                out.println(hmCookieTime.keySet());
+                for (String s : arr) {
+                    long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
+                    float diffMinutes = (float) (getTimeNow() - timeSaveCook) / 60000;
+                    //TODO: need realize writing to log
+                    //Удаление если возраст куки более 10ти минут
+                    if (diffMinutes > 10) {
+                        out.println("REMOVING: " + s);
+                        //из HM
+                        hmCookieTime.remove(s);
+                        //из PG
+//                            psql.execute("DELETE FROM cooks WHERE cookie='" + s + "'");
+                    }
+                }
+                out.println("\n");
+                new Main();
             }
+        } catch (Exception ignored) {
+        } finally {
+//                psql.closeConnection();
         }
     }
+}
 }

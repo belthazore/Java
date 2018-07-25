@@ -1,12 +1,11 @@
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Вопрос
-// 1. jdbcPostgres дергать лучше через статику или через экземплар
-// 2. conn.close() как вызывать для всех "нитей"
 
 /**
  * Менеджер Cookie-s
@@ -18,64 +17,57 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class Cookies {
 
-//    Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
-//    iter.hasn... не тянется :(
-
-    private static ConcurrentHashMap<String, Long> zzz = new ConcurrentHashMap<>(1024);
-
-    static void asd(){
-        zzz.put("sadsad", 1L);
-        zzz.put("sadsad2", 1L);
-
-        Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
-        while(iter.hasNext()){
-            Map.Entry<String, Long> e = iter.next();
-            e.getValue();
-            //iter.remove();
-        }
-    }
-
-    static Map<String, Long> hmCookieTime =
-            Collections.synchronizedMap(new HashMap<String, Long>(1024)); // ConcurrentHashMap
 
 
+//    // Проверка и удаление кук
+//    static void asd(){
+//        zzz.put("sadsad", 1L);
+//        zzz.put("sadsad2", 1L);
+//
+//        Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator();
+//        while(iter.hasNext()){
+//            Map.Entry<String, Long> e = iter.next();
+//            e.getValue();
+//            //iter.remove();
+//        }
+//    }
+
+    // todo: remove
+    // Remove after debug hm ver 2
+//    static Map<String, Long> hmCookieTime =
+//            Collections.synchronizedMap(new HashMap<String, Long>(1024));
+
+    static ConcurrentHashMap<String, Long> cookiesAndSavingTime = new ConcurrentHashMap<>(1024);
     private static String COOKIE_NAME = Configuration.get("cookie_name");
-    private static int COOKIE_LIFETIME_MIN =
-            // то же время перезапуска потока автоудаления
-            Integer.valueOf(Configuration.get("cookie_lifetime_min"));
+
+    // то же время перезапуска потока автоудаления
+//    private static int COOKIE_LIFETIME_MIN = Integer.valueOf(Configuration.get("cookie_lifetime_min"));
+    private static int COOKIE_LIFETIME_MIN = 1;
 
 
 
     {
         jdbcPostgres psql = null;
-        //jdbc кеширование в HM кук(Str) и времени(Str) БД, таблицы cooks
+
+        // кеширование кук и времени из БД таблицы cooks,
         try {
             psql= new jdbcPostgres();
             ResultSet rsData = psql.execute("SELECT * FROM cooks");
             while (rsData.next()) {
-                String cook = rsData.getString(1);
-                long time = Long.parseLong(rsData.getString(2)); //todo: integer in pgsql
-//                hmCookieTime.put(cook, time); // закешируем сохраненные куки/время сохранения
-                zzz.put(cook, time);
+                String cookie = rsData.getString(1);
+                long timeSavingCookie = Long.parseLong(rsData.getString(2)); //todo: integer in pgsql
+                cookiesAndSavingTime.put(cookie, timeSavingCookie);
             }
 
+            // todo: rm after dbg
             // Старт автоочистки кук старше 10 минут
-            //
-            // 1. Thread
-            // Вешает Tomcat (исправлено)
-            //
-            TenMinutesRunnable tmt = new TenMinutesRunnable();
-            Thread thr = new Thread(tmt);
-            thr.setDaemon(true);
-            thr.start();
+//            TenMinutesRunnable tmt = new TenMinutesRunnable();
+//            Thread thr = new Thread(tmt);
+//            thr.setDaemon(true);
+//            thr.start();
 
-
-            // 2. Executor
-            // ВЕШАЕТ CPU
-            //
-//            ScheduledExecutorService mExecutor = Executors.newSingleThreadScheduledExecutor();
-//            mExecutor.schedule(getSendRunnable(), COOKIE_LIFETIME_MIN, TimeUnit.MINUTES); //60 секунд перезапуск потока
-
+            AutoCleanCooksThread acct = new AutoCleanCooksThread();
+            acct.start();
 
         } catch (Exception e) { e.printStackTrace(); }
         finally { if (psql!=null) psql.closeConnection();}
@@ -90,7 +82,7 @@ class Cookies {
     // сохранить куку (если нет) в HM и PSQL
     static void saveCookie(String cookie) {
         long timeNow = getTimeNow();
-        hmCookieTime.put(cookie, timeNow); //put("DKVBJ3JH2B4JH24JB", "1529225995842")
+        cookiesAndSavingTime.put(cookie, timeNow); //put("DKVBJ3JH2B4JH24JB", "1529225995842")
         jdbcPostgres.execute2(
                 "INSERT INTO cooks(cookie, time) VALUES (?, ?) ON CONFLICT (cookie) DO UPDATE SET time = ?",
                 new String[]{cookie, String.valueOf(timeNow), String.valueOf(timeNow)});
@@ -102,7 +94,7 @@ class Cookies {
         if (cookArr != null) {
             for (Cookie cook : cookArr) {
                 if (cook.getName().equals(COOKIE_NAME)) { //кука authCook есть в req & есть в HM
-                    result = hmCookieTime.containsKey(cook.getValue());
+                    result = cookiesAndSavingTime.containsKey(cook.getValue());
                     break;
                 }
             }
@@ -117,108 +109,90 @@ class Cookies {
     }
 
 
-//    Автоочистка просроченных кук и HM и PSQL
-//    Вешает CPU
-//
-    private Runnable getSendRunnable() {
-        return new Runnable() {
-            public void run() {
-                try {
-                    while (true) {
-                        String[] arr = hmCookieTime.keySet().toArray(new String[]{}); //arr become =["key-0","key-N"]
-                        long timeNow = getTimeNow();
-                        for (String s : arr) {
-                            long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
-                            float diffMinutes = (float) (timeNow - timeSaveCook) / 60000; // конвертируем разницу времен в минуты
-                            //TODO: need realize writing to log
-                            //Удаление если возраст куки более 10ти минут
-                            if (diffMinutes > COOKIE_LIFETIME_MIN) {
 
-                                //из HM
-                                hmCookieTime.remove(s);
+    static class AutoCleanCooksThread extends Thread {
+        String cookie;
+        long cookieSaveTime;
+        int countThreadStarts = 0;
 
-                                //из PG
-                                jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-    }
-
-    class AutocleanerThread extends Thread{
-        public void run(){
-            while (true) {
-                try {
-                    String[] arr = hmCookieTime.keySet().toArray(new String[]{}); // Collection become arr =["key-0","key-N"]
-                    long timeNow = getTimeNow();
-                    for (String s : arr) {
-                        long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
-                        float diffMinutes = (float) (timeNow - timeSaveCook) / 60000; // конвертируем разницу времен в минуты
-                        //TODO: need realize writing to log
-                        //Удаление если возраст куки более 'COOKIE_LIFETIME_MIN' минут
-                        if (diffMinutes > COOKIE_LIFETIME_MIN) {
-
-                            // из HM
-                            hmCookieTime.remove(s);
-
-                            // из PG
-                            jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
-                        }
-                    }
-
-                }
-                catch (Exception e) { e.printStackTrace(); }
-                finally {
-                    try {
-                        Thread.sleep(60000*COOKIE_LIFETIME_MIN);
-                    } catch (InterruptedException e) { e.printStackTrace(); }
-                }
-            }
-        }
-    }
-
-    class TenMinutesRunnable implements Runnable { //
-//                for (Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator(); iter.hasNext();) {
-//                    Map.Entry<String, Long> e = iter.next();
-//                    e.getValue();
-//                    iter.remove();
-//                }
         public void run() {
+//            Log.writeInfo("Thread START ..."); // todo NOT WORKED :(
+
             while (true) {
                 try {
-                    String[] arr = hmCookieTime.keySet().toArray(new String[]{}); // Collection become arr =["key-0","key-N"]
-                    long timeNow = getTimeNow();
-                    for (String s : arr) {
-                        long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
-                        float diffMinutes = (float) (timeNow - timeSaveCook) / 60000; // конвертируем разницу времен в минуты
-                        //TODO: need realize writing to log
+                    countThreadStarts++;
+//                    Log.writeInfo("start: " + countThreadStarts + " thread");
+                    Iterator<Map.Entry<String, Long>> hmIterator = cookiesAndSavingTime.entrySet().iterator();
+                    while (hmIterator.hasNext()) {
+                        Map.Entry<String, Long> hmEntry = hmIterator.next();
+                        cookie = hmEntry.getKey();
+                        cookieSaveTime = hmEntry.getValue(); // получим время сохранения куки из HM
+                        float diffMinutes = (float) (System.currentTimeMillis() - cookieSaveTime) / 60000; // конвертируем разницу времен в минуты
+
+//                        Log.writeInfo("Cook " + hmEntry.getKey() + " age: " +        // TODO: Remove after debug
+//                                diffMinutes + " minute");
+
+
                         //Удаление если возраст куки более 'COOKIE_LIFETIME_MIN' минут
                         if (diffMinutes > COOKIE_LIFETIME_MIN) {
+//                            Log.writeInfo(diffMinutes + " > " + COOKIE_LIFETIME_MIN); // TODO: Remove after debug
 
-                            // из HM
-                            hmCookieTime.remove(s);
+                            hmIterator.remove(); // из HM
 
-                            // из PG
-                            jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
+//                        jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{cookie}); //ИЗ БД
                         }
                     }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        Thread.sleep(60000*COOKIE_LIFETIME_MIN);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                } catch (Exception e) { e.printStackTrace(); }
+
+                try {
+//                    Log.writeInfo("I`m sleeping...");
+                    Thread.sleep(60000 * COOKIE_LIFETIME_MIN);
+                } catch (InterruptedException e) { e.printStackTrace(); }
+
+//                Log.writeInfo("AFTER: " + cookiesAndSavingTime.keySet());
             }
         }
     }
+
+//    class TenMinutesRunnable implements Runnable { //
+////                for (Iterator<Map.Entry<String, Long>> iter = zzz.entrySet().iterator(); iter.hasNext();) {
+////                    Map.Entry<String, Long> e = iter.next();
+////                    e.getValue();
+////                    iter.remove();
+////                }
+//        public void run() {
+//            while (true) {
+//                try {
+//                    String[] arr = hmCookieTime.keySet().toArray(new String[]{}); // Collection become arr =["key-0","key-N"]
+//                    long timeNow = getTimeNow();
+//                    for (String s : arr) {
+//                        long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
+//                        float diffMinutes = (float) (timeNow - timeSaveCook) / 60000; // конвертируем разницу времен в минуты
+//                        //TODO: need realize writing to log
+//                        //Удаление если возраст куки более 'COOKIE_LIFETIME_MIN' минут
+//                        if (diffMinutes > COOKIE_LIFETIME_MIN) {
+//
+//                            // из HM
+//                            hmCookieTime.remove(s);
+//
+//                            // из PG
+//                            jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{s});
+//                        }
+//                    }
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    try {
+//                        Thread.sleep(60000*COOKIE_LIFETIME_MIN);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
 }

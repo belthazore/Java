@@ -17,6 +17,8 @@ public class Gate extends HttpServlet {
         StringBuilder PAGE = new StringBuilder();
         PAGE.append("<h3>Gate</h3><br>");
 
+        Log.writeTransition("Gate.CONNECTED", request);
+
 
         // переход с логином|паролем
         // Получим введенные данные

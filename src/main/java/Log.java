@@ -1,3 +1,4 @@
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +12,7 @@ import java.util.Date;
 class Log {
 
 //    static String PATH_TO_FOLDER = ".//logs"; //TODO. Сейчас это вызывает java.nio.file.AccessDeniedException
-    private static String PATH_TO_FOLDER = "//opt//tomcat//webapps//project//logs";
+    private static String PATH_TO_FOLDER = "//opt//tomcat//webapps//logs";
     private static String PATH_TO_FILE = null;
 
     //TODO реализовать ограничение на N-запросов записи в N2-секунд
@@ -20,9 +21,15 @@ class Log {
 
 
 
-    static void writeInfo(String logMsg){    write("INFO",  logMsg); }
     static void writeError(String logMsg){   write("ERROR", logMsg); }
     static void writeWarning(String logMsg){ write("WARN",  logMsg); }
+    static void writeInfo(String logMsg){    write("INFO",  logMsg); }
+    static void writeTransition(String locationClassComment, HttpServletRequest request){
+        String URL, reqQueryString;
+        reqQueryString = request.getQueryString();
+        URL = request.getRequestURL() + (reqQueryString!=null ? ("?" + reqQueryString) : ""); // хак, позволяющий получить полный урл с параметрами если они есть
+        String logMsg = locationClassComment + ": " + request.getRemoteAddr() + " | port " + request.getRemotePort() + " | URL " + URL;
+        write("INFO",  logMsg); } //записать действие посетителя
 
 
 
@@ -50,6 +57,8 @@ class Log {
 
 
 
+
+
     //  Создать лог-файл, если такового еще нет
     //  Прим. имени: "error_010118.log"
     private static void createFILEifNeed(String logType){
@@ -68,7 +77,6 @@ class Log {
             if (logFileNotPresent) Files.createFile(Paths.get(PATH_TO_FILE));
         } catch (IOException e) { e.printStackTrace(); }
     }
-
 
 
 
