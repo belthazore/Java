@@ -13,11 +13,12 @@ public class Gate extends HttpServlet {
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html;charset=utf-8");
-        StringBuilder PAGE = new StringBuilder();
-        PAGE.append("<h3>Gate</h3><br>");
 
-        Log.writeTransition("Gate.CONNECTED", request);
+//        StringBuilder PAGE = new StringBuilder();
+//        PAGE.append("<h3>Gate</h3><br>");
+        response.setContentType("text/html;charset=utf-8");
+
+        Log.transition("Gate.Login try", request);
 
 
         // переход с логином|паролем
@@ -36,15 +37,15 @@ public class Gate extends HttpServlet {
             if (Users.isRegisteredUser(login, password)) {
                 Cookie cook = Cookies.getNewCookie();
                 response.addCookie(cook);
-                Cookies.saveCookie(cook.getValue()); // сохраним в HM и PSQL новую куку с текущим временем(long)
+                Cookies.saveOrUpdateCookie(cook.getValue()); // сохраним в HM и PSQL новую куку с текущим временем(long)
 //              PAGE.append("lp = OK");
                 response.sendRedirect("/project/home");
             } else {
 //                PAGE.append("lp NOT OK");
-                response.sendRedirect("/project/login?badResult=Login+or+password+is+incorrect");
+                response.sendRedirect("/project/login?result=Login+or+password+is+incorrect");
             }
         } else { //Переход без логина и пароля
-            if (Cookies.isValidCookie(request)) {
+            if (Cookies.haveValidCookie(request)) {
 //                PAGE.append("Cookie is valid");
                 response.sendRedirect("/project/home");
             } else {

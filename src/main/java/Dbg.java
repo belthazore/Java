@@ -1,16 +1,11 @@
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 public class Dbg extends HttpServlet {
@@ -19,8 +14,8 @@ public class Dbg extends HttpServlet {
     private static Map <String, String> hmResult = new HashMap<String, String>(); //ключ= модуль страницы,
     // прим. 'MD5', значение=String с '<br>' тэгами
 
+    static Map<String, Long> debug_old = new HashMap<>(); // Для отладки, сохранение промежуточных результатов
     private Cookie[] COOKIE_ARR;
-    private long TIME_NOW_MINUTE = (System.currentTimeMillis()/1000)/60;
     private String COOKIE_CURRENT_STR;
     private String ACTION_URL,
             CONTENT_TYPE,
@@ -31,6 +26,10 @@ public class Dbg extends HttpServlet {
     private int COOKIE_MAX_AGE = 1800;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        long TIME_NOW_MINUTE = (System.currentTimeMillis()/1000)/60;
+
+        long TIME_NOW_MS = System.currentTimeMillis();
+
         COOKIE_ARR = request.getCookies();
         COOKIE_CURRENT_STR = getCookieStr();
 
@@ -41,25 +40,36 @@ public class Dbg extends HttpServlet {
 
         pageBody.append("<h1>Тест сервер:<br>Amazon EC2 + JavaServlet + Apache Tomcat + Postgres</h1><br><br>");
 
-        pageBody.append("0. Configuration.get(\"db_driver\"): "+Configuration.get("db_driver")+"<br>");
-        pageBody.append("1. Cookies in PSQL:<br>"+Cookies.cookiesAndSavingTime.keySet()+"<br><br>");
 
+        pageBody.append("<p align=\"right\"><input onclick=\"location.href='/project/dbg?action=exit2#request_params'\" value=\"Тест action + якорь\" type=\"button\"></p>");
+        pageBody.append("<br> 0. Configuration.get(\"db_driver\"): "+Configuration.get("db_driver"));
+        pageBody.append("<br> 1. Cookies in HM (Cookies.cookiesAndSavingTime):<br>"+Cookies.cookiesAndSavingTime.keySet()+"<br><br>");
+
+        /*
+        Diff
+        Cookie / min / sec
+        3d28 / 0 / 2300
+        3d29 / 0 / 2300
+        3d20 / 0 / 2300
+        */
         if (!Cookies.cookiesAndSavingTime.isEmpty()){
-            pageBody.append("1.1 Diffs time savings: ");
+            pageBody.append("1.1 Diff time savings:<br>Cookie Value / min / sec<br>");
             Collection<Long> arr = Cookies.cookiesAndSavingTime.values();
             for (long timeSave :arr) {
-                float diffMinutes = (Cookies.getTimeNow() - timeSave)/60000;
-                pageBody.append(timeSave+ ": " + diffMinutes+"<br>");
+                long diffMil = Cookies.getTimeNow() - timeSave;
+                long diffMin = diffMil / 60000;
+                pageBody.append(timeSave + " / " + diffMin + " / " + diffMil + "<br>");
             }
             pageBody.append("<br><br>");
         }
 
         pageBody.append("2. Registered users in PSQL:<br>"+Users.registeredUsers.keySet()+"<br><br>");
+        pageBody.append("3. Time back 10 minute is: " + (System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(11)) + "<br><br>");
 
 
         Date dateNow = new Date();
         pageBody.append("<getFormAuthorization action=\"" + ACTION_URL + "\">");
-        pageBody.append(new SimpleDateFormat("HH:mm:ss").format(dateNow)).append(
+        pageBody.append(TIME_NOW_MS + "<br>").append(new SimpleDateFormat("HH:mm:ss").format(dateNow)).append(
                 "<br>" + new SimpleDateFormat("dd-MM-yyyy").format(dateNow) + "<br><br>");
 
 
@@ -78,6 +88,16 @@ public class Dbg extends HttpServlet {
         );
 
 
+        /*
+        // String action = request.getParameter("action");
+        // Операция выхода из кабинета
+        if(action!=null && action.equals("exit")){
+            Cookies.deleteFromDbAndHashM(request);
+            HttpSession session = request.getSession();
+            session.invalidate();
+            response.sendRedirect("/project/");
+            return;
+        }*/
 
 
         String MD5=
@@ -93,7 +113,7 @@ public class Dbg extends HttpServlet {
 
 
         // Попробуем получить текст и хеш из прошлого вызова
-        //Вариант 1
+        // Вариант 1
         pageBody.append("Попробуем получить текст и хеш из прошлого вызова<br><br><b>Вариант 1</b><br><br>");
         String inputForMD5Encode = request.getParameter("input");
         pageBody.append(inputForMD5Encode != null ? (inputForMD5Encode + " is " + getMD5(inputForMD5Encode)) : "");
@@ -115,8 +135,8 @@ public class Dbg extends HttpServlet {
 
 
 
-
         pageBody.append("<br><br><br><br><br><br>" +
+                "<a name=\"request_params\"></a>" + //Якорь тест
                 "<br> <b>REQUEST parameters</b>" +
                 "<br> -----------------------------------" +
                 "<br> getServletPath(): " + request.getServletPath() +
@@ -125,17 +145,21 @@ public class Dbg extends HttpServlet {
                 "<br> getRequestURL(): " + request.getRequestURL() +
                 "<br> -----------------------------------" +
                 "<br> <b>REMOTE parameters</b>" +
-                "<br>request.getRemoteAddr(): " + request.getRemoteAddr() +
-                "<br>request.getRemotePort(): " + request.getRemotePort() +
-                "<br>request.getRemoteHost(): " + request.getRemoteHost() +
+                "<br> getRemoteAddr(): " + request.getRemoteAddr() +
+                "<br> getRemotePort(): " + request.getRemotePort() +
+                "<br> getRemoteHost(): " + request.getRemoteHost() +
                 "<br> -----------------------------------" +
-                request.getQueryString()
+                "<br> getQueryString(): " + (request.getQueryString()==null ?
+                            "null. Need call page: ../dbg?key=val&key2=val2" : request.getQueryString()) +
+                "<br> -----------------------------------"
         );
         pageBody.append("<br> validCookie(request): " + validCookie(request));
         pageBody.append("<br> HashMe.getMD5(\"test\"): " + getMD5("test") + "</getFormAuthorization>");
 
-//        Log.writeError("jdbcPostgres: test");
-//        Log.writeInfo("jdbcPostgres: test INFO");
+//        Log.error("jdbcPostgres: test");
+//        Log.info("jdbcPostgres: test INFO");
+
+
 
 
 
@@ -190,85 +214,4 @@ public class Dbg extends HttpServlet {
         return "test";
     }
 
-//    private void cookieTimeUpdateIfNeed(HttpServletRequest request) {
-//        //текущее время = TimeNow
-//
-//        if (validCookie(request)) {//если Кука есть, незаэкспайреная
-//            HASHMAP.put(COOKIE_CURRENT_STR, TIME_NOW_MINUTE);
-//
-//            try {Thread.sleepTime(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace(); }
-//
-//            long COOKIE_SAVED_TIME = HASHMAP.get(COOKIE_CURRENT_STR);
-//            out.println();
-//        }
-//
-//
-//            getSaveTimeByCookie()
-//            diffTimeMinute
-//        }
-//            TimeSavingCookie = взять время сохранения из HashMap () или из PSQL
-//                diffTime = TimeNow - TimeSavingCookie;
-//        if(diffTime>14 && diffTime<31)
-//            обновить время по этой куке в HM и psql
-//        }
-//    }
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-        /*
-        resp.setContentType("text/html;charset=utf-8");
-
-        PrintWriter pw = resp.getWriter();
-
-        Integer a = 0, b = 0, c = 0;
-        Boolean Error = false;
-
-        String param_a = req.getParameter("a");
-        String param_b = req.getParameter("b");
-
-        try {
-            a = Integer.parseInt(param_a);
-            b = Integer.parseInt(param_b);
-        }
-        catch (NumberFormatException e) {
-            Error = true;
-        }
-
-        if (Error) {
-            pw.println("<h1>ERROR Response<h1/>");
-            
-        }
-        else {
-            c = a + b;
-
-            pw.println(c+" TESTTTT");
-        }
-        */
-
-
-
-                /*
-        // AuthorizationChecker add
-        AuthorizationChecker name = new AuthorizationChecker("name", "nameTest"); //URLEncoder.encode(req.getParameter("name"), "UTF-8"));
-        AuthorizationChecker url = new AuthorizationChecker("url", ACTION_URL);
-        name.setMaxAge(60*60*24); //
-        url.setMaxAge(60*60*24);
-        response.addCookie(name);
-        response.addCookie(url);
-        */
-
-// Date & time
-//        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");

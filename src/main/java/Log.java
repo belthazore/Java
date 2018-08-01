@@ -21,10 +21,10 @@ class Log {
 
 
 
-    static void writeError(String logMsg){   write("ERROR", logMsg); }
-    static void writeWarning(String logMsg){ write("WARN",  logMsg); }
-    static void writeInfo(String logMsg){    write("INFO",  logMsg); }
-    static void writeTransition(String locationClassComment, HttpServletRequest request){
+    static void error(String logMsg){   write("ERROR", logMsg); }
+    static void warning(String logMsg){ write("WARN",  logMsg); }
+    static void info(String logMsg){    write("INFO",  logMsg); }
+    static void transition(String locationClassComment, HttpServletRequest request){
         String URL, reqQueryString;
         reqQueryString = request.getQueryString();
         URL = request.getRequestURL() + (reqQueryString!=null ? ("?" + reqQueryString) : ""); // хак, позволяющий получить полный урл с параметрами если они есть

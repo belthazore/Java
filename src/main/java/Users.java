@@ -11,7 +11,7 @@ class Users {
 
     static{
         jdbcPostgres psql = new jdbcPostgres();
-        ResultSet rs = psql.execute("SELECT * FROM users");
+        ResultSet rs = psql.executeSelect("SELECT * FROM users");
         try {
             if (rs!=null) {
                 while (rs.next()) {

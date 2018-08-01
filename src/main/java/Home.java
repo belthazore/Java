@@ -1,10 +1,14 @@
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 // Сюда попадают те, кто успешно авторизовался тут '/login'
@@ -15,34 +19,32 @@ import java.util.*;
 
 public class Home extends HttpServlet {
 
-    Map<String, ArrayList<String>> SEARCH_RESULTS = new HashMap<>();
+    private Map<String, ArrayList<String>> SEARCH_RESULTS = new HashMap<>();
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        if (!Cookies.isValidCookie(request)) { // Не валидна или ее вообще нет
+        if (Cookies.cookiesAndSavingTime.isEmpty() || !Cookies.haveValidCookie(request)) { // Не валидна или ее вообще нет
             response.sendRedirect("/project/login");
         }
 
-        // Запишем успешную авторизацию
-        Log.writeTransition("Home.Logined with cookie success", request);
+        /*
+        Интересный BUG (fixed)
+        Суть:
+        даже при отработке true в 23 строке этого класса Redirect не происходит(!), выполнение доходит до
+        Cookies.updateSavingTimeIfNeed(request) - парадокс!
 
-        // T ODO: 1. добавить проверку куки, если ее нет или она не валидна - редирект на /login
-        // T ODO: 2. имя юзера брать с cookie [] по ключу user(? или брать куку, по ней в HM находить user)
-
-
-        StringBuilder PAGE = new StringBuilder();
-        response.setContentType("text/html;charset=utf-8");
-
-
-        String head =
-                "<head>" +
-                "  <title>Java Tomcat test server | Login</title>" +
-                getStyle() +
-                "</head>";
+        0. Убрать if проверку в Cookies USTIN на наличие куки в HashM
+        1. redeploy
+        2. В БД, 'cooks' ничего нет, в HashM тоже
+        3. Переходим 'localhost:8080/project/home'
+        4. java.lang.NullPointerException
+                Cookies.updateSavingTimeIfNeed(Cookies.java:103)
+                Home.doGet(Home.java:29)
+        */
 
 
-//        product=Tortilla&phone_number=0671234567&action=create
+
 
         String action, orderId, product, phoneNumber; // проверенные параметры (!"" | "")
         String actionNeedCheck, orderIdNeedCheck, productNeedCheck, phoneNumberNeedCheck; // параметры для проверки, могут быть == null
@@ -57,48 +59,68 @@ public class Home extends HttpServlet {
         // если так не делать, то в кейсе 'action==null' блок
         // 'if ( action!=null & (action.equals("find") | action.equals("create") ){}'
         // дает NullPointerException =(
-        action = ( actionNeedCheck==null ? "" : actionNeedCheck);
-        orderId = ( orderIdNeedCheck==null ? "" : orderIdNeedCheck);
+        action = (actionNeedCheck == null ? "" : actionNeedCheck);
+        orderId = (orderIdNeedCheck == null ? "" : orderIdNeedCheck);
 
-        product = ( productNeedCheck==null ? "" : productNeedCheck);
-        phoneNumber = ( phoneNumberNeedCheck==null ? "" : phoneNumberNeedCheck);
+        product = (productNeedCheck == null ? "" : productNeedCheck);
+        phoneNumber = (phoneNumberNeedCheck == null ? "" : phoneNumberNeedCheck);
+
+
+        // Операция выхода из кабинета
+        // todo забиндить под 'a href'
+        if(action.equals("exit")){
+            Cookies.deleteFromDbAndHashM(request);
+            HttpSession session = request.getSession();
+            session.invalidate();
+            response.sendRedirect("/project/");
+            return;
+        }
+
+
+
+        Cookies.updateSavingTimeIfNeed(request);
+
+        // Запишем успешную авторизацию
+        Log.transition("Home. Logined with cookie success", request);
+
+
+        StringBuilder PAGE = new StringBuilder();
+        response.setContentType("text/html;charset=utf-8");
+
+        String head =
+                "<head>" +
+                        "  <title>Java Tomcat test server | Login</title>" +
+                        getStyle() +
+                        "</head>";
 
 
 
         // выполнение действий и сохранение их результатов в историю HashMap
         // TODO: сохранять по логину пользователя историю индивидуально
-        if (action.equals("find") | action.equals("create")){
+        if (action.equals("find") | action.equals("create")) {
             String actionResult = doAction(action, (action.equals("find") ? new String[]{orderId} : new String[]{product, phoneNumber}));
-                if (actionResult != null) {
-                    try {
-                        SEARCH_RESULTS.get(action).add("["+getDateTimeNow() + "]   " + actionResult); // добавим результат запроса в историю
-                    }catch (NullPointerException e){ //еще нет такого ключа 'action', тогда добавим в HM запись впервые. Прим. '"find", ArrayList<S> {"07-07-2018 14:47:39 4 | Macaroni: 45 pcs | 0671234567"}'
-                        ArrayList <String> tempArrList = new ArrayList<>();
-                        tempArrList.add("["+getDateTimeNow() + "]   " + actionResult);
-                        SEARCH_RESULTS.put(action, tempArrList);
-                    }
+            if (actionResult != null && SEARCH_RESULTS.containsKey(action)) {
+                SEARCH_RESULTS.get(action).add("[" + getDateTimeNow() + "]   " + actionResult); // добавим результат запроса в историю
 
-//                        dateTimeNow + " " + actionResult;
-//                String[] resultsByActionCurr = SEARCH_RESULTS.get(action) + new String[]{"1"}; // ["010203 test1", "010203 test2"]
-
-//                SEARCH_RESULTS.put(action, new String[]{"1"});
-//                SEARCH_RESULTS2.get(action).add(getDateTimeNow() + " " + actionResult); // Добавим в ArrayList результат выполнения нового запроса
-                }
+            } else {//еще нет такого 'action', добавим в HashM. Прим. '"find", ArrayList<S> {"07-07-2018 14:47:39 4 | Macaroni: 45 pcs | 0671234567"}'
+                ArrayList<String> tempArrList = new ArrayList<>();
+                tempArrList.add("[" + getDateTimeNow() + "]   " + actionResult);
+                SEARCH_RESULTS.put(action, tempArrList);
+            }
         }
-
-
-
-
 
 
 
         // - - - - - - - - - - -   Find order   - - - - - - - - - - -
         String body =
                 "<body>" +
+                        "<p align=\"right\"><input onclick=\"location.href='/project/home?action=exit'\" value=\"Выйти\" type=\"button\"></p>" +
+
                         "  <div class=\"login-page\">" +
                         "    <div class=\"form\"  float=\"left\">" +
+                        "    <a name=\"find_form\"></a>" + // якорь
                         "        <b>Find order</b>" +
-                        "        <form action=\"/project/home\" style=\"width: 300px;margin: auto;\">" +
+                        "        <form action=\"/project/home#find_form\" style=\"width: 300px;margin: auto;\">" +
                         "            <br><br>" +
                         "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
                         "            <br><br>" +
@@ -107,9 +129,10 @@ public class Home extends HttpServlet {
                         "        </form>" +
                         getHistoryByAction("find") +
                         "    </div>" +
+                        "    <a name=\"create_form\"></a>" + // якорь
                         "    <div class=\"form\" float=\"right\">" +
                         "        <b>Create order</b>" +
-                        "        <form action=\"/project/home\" style=\"width: 300px;margin: auto;\">" +
+                        "        <form action=\"/project/home#create_form\" style=\"width: 300px;margin: auto;\">" +
                         "            <br><br>" +
 //                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
                         "            <input name=\"product\" placeholder=\"product\" type=\"text\">" +
@@ -122,32 +145,32 @@ public class Home extends HttpServlet {
                         "    </div>" +
                         "  </div>" +
                         "</body>";
-        PAGE.append(head+body);
+        PAGE.append(head + body);
         response.getWriter().println(PAGE);
     }
 
 
     // Example: 06-07-2018 22:38:28
-    private String getDateTimeNow(){
+    private String getDateTimeNow() {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
     }
 
-    private String getHistoryByAction(String action){
+    private String getHistoryByAction(String action) {
         ArrayList<String> arrayListSearchResults = SEARCH_RESULTS.get(action);
-        if (arrayListSearchResults!=null){
+        if (arrayListSearchResults != null) {
             String buffer =
                     "<br><br><br>" +
-                    "<b>History</b>" +
-                    "<br>-----------------------------------------------------------------<br><br>";
-            for(Object o : arrayListSearchResults.toArray()){
-                buffer+=o+"<br><br>";
+                            "<b>History</b>" +
+                            "<br>-----------------------------------------------------------------<br><br>";
+            for (Object o : arrayListSearchResults.toArray()) {
+                buffer += o + "<br><br>";
             }
             return buffer;
-        }else
+        } else
             return "";
     }
 
-    private String doAction(String action, String[] params){
+    private String doAction(String action, String[] params) {
         // params[] в зависимости от action
         // find:   ["1"]
         // create: ["Merenga: 10 pcs", "0671234567"]
@@ -158,27 +181,27 @@ public class Home extends HttpServlet {
 
             switch (action) {
                 case "find":
-                    ResultSet rs = psql.execute("SELECT * FROM orders WHERE order_id='" + params[0] + "'"); //todo inejction
+                    ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE order_id='" + params[0] + "'"); //todo inejction
                     rs.next();
-                    result = rs.getString("order_id") +" | "+ rs.getString("product") +" | "+ rs.getString("client_phone");
+                    result = rs.getString("order_id") + " | " + rs.getString("product") + " | " + rs.getString("client_phone");
                     break;
                 case "create":
                     String QueryInsert =
-                        "INSERT INTO orders" +
-                        "  (order_id, product, client_phone)" +
-                        "VALUES" +
-                        "  (nextval('orders_order_id_seq'), '" + params[0] + "', '" + params[1] + "')"; // RUTRNUNG
-                    psql.execute(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
-                    ResultSet rs2 = psql.execute("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
+                            "INSERT INTO orders" +
+                                    "  (order_id, product, client_phone)" +
+                                    "VALUES" +
+                                    "  (nextval('orders_order_id_seq'), '" + params[0] + "', '" + params[1] + "')"; // RUTRNUNG
+                    psql.executeSelect(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
+                    ResultSet rs2 = psql.executeSelect("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
                     rs2.next();
                     result = rs2.getString(1) + " | " + params[0] + " | " + params[1];
                     break;
                 default:
                     throw new Exception("Wrong action");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             if (psql != null)
                 psql.closeConnection();
         }
@@ -186,7 +209,7 @@ public class Home extends HttpServlet {
     }
 
     // TODO: решить проблему добавления через "link rel"
-    private String getStyle(){
+    private String getStyle() {
         return
                 "  <style type=\"text/css\">\n" +
                         ".login-page {\n" +
@@ -327,7 +350,7 @@ public class Home extends HttpServlet {
 
         jdbcPostgres psql = new jdbcPostgres();
         try {
-            ResultSet rs = psql.execute("SELECT * FROM orders WHERE order_id=" + request.getParameter("order_id"));
+            ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE order_id=" + request.getParameter("order_id"));
             rs.next();
             String s1 = rs.getString(1); // тут палает если ничего не найдег ос ошибкой "ResultSet..perhap"
             // не упало, очистим SB SEARCH_RESULT

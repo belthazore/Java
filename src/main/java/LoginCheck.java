@@ -47,11 +47,11 @@ public class LoginCheck extends HttpServlet {
 //        jdbcPostgres psql = new jdbcPostgres();
 //        if (!loginAndPasswordIsEmpty){
 //            try {
-//                ResultSet rs = psql.execute("SELECT * FROM clients WHERE login='"+enteredLogin+"' AND password='"+enteredPassword+"'");
+//                ResultSet rs = psql.executeSelect("SELECT * FROM clients WHERE login='"+enteredLogin+"' AND password='"+enteredPassword+"'");
 //                rs.next();
 //                rs.getString(1); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
 //                Cookie cook = Cookies.getNewCookie();
-//                Cookies.saveCookie(cook); //TODO: Сохраним в PG нашу новую куку
+//                Cookies.saveOrUpdateCookie(cook); //TODO: Сохраним в PG нашу новую куку
 //                response.addCookie(cook);
 //                loginSuccess = true;
 //            }catch (Exception e){

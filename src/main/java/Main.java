@@ -26,14 +26,14 @@ public class Main {
     public static void main(String[] args) {
         try {
 //            out.println("\n 1. PGSQL testing Select queryes");
-//            ResultSet rsForCC = psql.execute("select * from users"); // для получения количеста колонок
+//            ResultSet rsForCC = psql.executeSelect("select * from users"); // для получения количеста колонок
 //            out.println("Column count = " + rsForCC.getMetaData().getColumnCount());
 //
-//            ResultSet rsForRC = psql.execute("select count(*) from users"); // для получения количеста записей
+//            ResultSet rsForRC = psql.executeSelect("select count(*) from users"); // для получения количеста записей
 //            rsForRC.next();
 //            out.println("Row count = " + rsForRC.getString(1));
 //
-//            ResultSet rs = psql.execute("SELECT * from users where login='first'");
+//            ResultSet rs = psql.executeSelect("SELECT * from users where login='first'");
 //            out.println("In search by login \"first\" result rows: " + psql.getRowCount(rs));
 
 
@@ -69,7 +69,7 @@ public class Main {
             // (Обновление времени куки, если клиент зашел)
             String QUERY_INSERT_ONE = "INSERT INTO cooks(cookie, time) VALUES ('cook_test1', '1529658000001')" +
                     " ON CONFLICT (cookie) DO UPDATE SET time =  '1529658000001'";
-//            out.println(QUERY_INSERT_ONE + ":\n" + psql.execute(QUERY_INSERT_ONE));
+//            out.println(QUERY_INSERT_ONE + ":\n" + psql.executeSelect(QUERY_INSERT_ONE));
 
 
             // 02. поиск (ХЗ)
@@ -79,7 +79,7 @@ public class Main {
 
             // 03. Удаление
             String QUERY_RM_ONE = "DELETE FROM cooks WHERE cookie='cook_test777'";
-//            psql.execute(QUERY_RM_ONE); // "Запрос не вернул результата"
+//            psql.executeSelect(QUERY_RM_ONE); // "Запрос не вернул результата"
             out.println("\n" + QUERY_RM_ONE + ":\n" + "");
 
 
@@ -90,8 +90,8 @@ public class Main {
             /**
 
              for (String s : arr){
-             long cookieSaveTime = hmCookieTime.get(s); //берем время куки(String) из HM >> в long
-             long diff = timeNow-cookieSaveTime;
+             long cookieSavingTime = hmCookieTime.get(s); //берем время куки(String) из HM >> в long
+             long diff = timeNow-cookieSavingTime;
              float diffSec = (float) (diff/1000);
              float diffMin = diffSec/60;
              boolean needRemove = (diffMin>10);
@@ -101,7 +101,7 @@ public class Main {
              //из HM
              hmCookieTime.remove(s);
              //из PG
-             psql.execute("DELETE FROM cooks WHERE cookie='"+s+"'");
+             psql.executeSelect("DELETE FROM cooks WHERE cookie='"+s+"'");
              }
              }
 
@@ -139,7 +139,7 @@ public class Main {
 
 //            out.println("KS: "+ Cookies.hmCookieTime.keySet());
 
-//            ResultSet rsUser = psql.execute("SELECT * FROM users WHERE login='l' AND password='p'");
+//            ResultSet rsUser = psql.executeSelect("SELECT * FROM users WHERE login='l' AND password='p'");
 //            rsUser.next();
 //            out.println("rsUser.getString: " + rsUser.getString(3)); // Если пользователь не найден, тут случается ошибка "ResultSet..perhap"
 
@@ -198,7 +198,7 @@ public class Main {
             out.println("- - - - - - - - - - - - - - - - - - - - - - - - ");
 
 
-//            ResultSet rs3 = jdbcPostgres.execute("SELECT * FROM users");
+//            ResultSet rs3 = jdbcPostgres.executeSelect("SELECT * FROM users");
 //            try {
 //                if (rs3!=null) {
 //                    while (rs3.next()) {
@@ -227,7 +227,7 @@ public class Main {
             }
 
             out.println("\n\n--------------- Postgres Test ---------------");
-//            ResultSet rsUsers = psql.execute("SELECT * FROM users");
+//            ResultSet rsUsers = psql.executeSelect("SELECT * FROM users");
 //            try {
 //                if (rsUsers!=null) {
 //                    while (rsUsers.next()) {
@@ -285,11 +285,16 @@ public class Main {
             // для проверки и удаления кук из HM и Postgres
             out.println("UNTIL: " + hm.keySet());
 
+            /*
             // Старт потока авточистки с перезапуском
             AutoCleanCooksThread2 act = new AutoCleanCooksThread2();
             act.setDaemon(true);
             act.run();
+            */
 
+            long timeNow = Cookies.getTimeNow();
+            out.println(timeNow);
+            out.println(timeNow);
 
 
 
@@ -302,8 +307,8 @@ public class Main {
     //
 //                while (hmIter.hasNext()) {
 //        Map.Entry<String, Long> hmEntry = hmIter.next();
-//        long cookieSaveTime = hmEntry.getValue(); //берем время сохранения куки из HM
-//        float diffMinutes = (float) (Cookies.getTimeNow() - cookieSaveTime) / 60000; // конвертируем разницу времен в минуты
+//        long cookieSavingTime = hmEntry.getValue(); //берем время сохранения куки из HM
+//        float diffMinutes = (float) (Cookies.getTimeNow() - cookieSavingTime) / 60000; // конвертируем разницу времен в минуты
 //        out.println("Cook " + hmEntry.getKey() + " age: " +        // TODO: Remove after debug
 //                diffMinutes + " minute");
 //
@@ -357,7 +362,7 @@ public class Main {
 
                             hmIterator.remove(); // из HM
 
-//                        jdbcPostgres.execute2("DELETE FROM cooks WHERE cookie=?", new String[]{cookie}); //ИЗ БД
+//                        jdbcPostgres.execute("DELETE FROM cooks WHERE cookie=?", new String[]{cookie}); //ИЗ БД
                         }
                     }
 
@@ -484,7 +489,7 @@ static class TenMinutesThread implements Runnable {
                         //из HM
                         hmCookieTime.remove(s);
                         //из PG
-//                            psql.execute("DELETE FROM cooks WHERE cookie='" + s + "'");
+//                            psql.executeSelect("DELETE FROM cooks WHERE cookie='" + s + "'");
                     }
                 }
                 out.println("\n");
