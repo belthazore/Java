@@ -30,6 +30,8 @@
         <input  type="password" name="password" placeholder="password" value= <%= password%> /><br>
         <br>
         <button type="submit"   style="border-radius: 3px;">Login</button>
+        <br><br>
+        <a href="/project/registration">Sign up</a>
           <!-- Если авторизация не успешна - сообщим -->
         <p style="color: red"><%= status %></p>
       </form>
