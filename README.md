@@ -4,6 +4,7 @@
 #### Используется
  - Servlet 
  - JSP
+ - Maven
  - Apache Tomcat v9.0.10
  - PostgreSQL 9.6.9
  - Amazon EC2, сервер t2.micro
