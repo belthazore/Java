@@ -28,10 +28,12 @@
 
       <form action="/project/registrationutil">
         <b>Registration</b>
+        <b>______________________________</b>
         <br><br><br>
         <input  type="text"     name="login"    placeholder="login" value= <%= login%> /><br>
         <input  type="password" name="password" placeholder="password" value= <%= password%> /><br>
         <input  type="text"     name="email"    placeholder="email" value= <%= email%> /><br>
+        <br>
         <button type="submit"   style="border-radius: 3px;">Register</button>
           <!-- Если авторизация не успешна - сообщим -->
         <p style="color: red"><%= status %></p>

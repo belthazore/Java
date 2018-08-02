@@ -31,7 +31,7 @@ public class RegistrationUtil extends HttpServlet {
         // бережем его нервы :)
         String oldParams = "";
         if ( loginNotEmpty | emailNotEmpty ) { // хотя-бы один параметр не null - начнем с артикля
-            oldParams += "&";
+//            oldParams += "&";
             for (String[] param : new String[][]{{"login", login}, {"email", email}}){ // {"password", password} - не используем
                 if (param[1]!=null) // параметр не пуст
                     oldParams += "&" + param[0] + "=" + param[1]; // &login=my_login&password=my_password
@@ -50,7 +50,7 @@ public class RegistrationUtil extends HttpServlet {
 
             }else {
                 jdbcPostgres.execute( "INSERT INTO users(login, password, email) VALUES (?, ?, ?)", new String[]{login, password, email} );
-                response.sendRedirect("/project/login?result=Registration+success,+try+login");
+                response.sendRedirect("/project/login?result=Registration+success,+try+login&login=" + request.getParameter("login"));
             }
 
         }
