@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="javax.servlet-api-3.0.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Main/src/servlet-api.jar!/" />
+      <root url="jar:///usr/lib/jvm/default-java/jre/lib/ext/postgresql-42.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
