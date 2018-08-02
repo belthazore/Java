@@ -49,7 +49,10 @@ public class RegistrationUtil extends HttpServlet {
                 response.sendRedirect("/project/registration?result=email+already+exist" + oldParams);
 
             }else {
+                // В БД
                 jdbcPostgres.execute( "INSERT INTO users(login, password, email) VALUES (?, ?, ?)", new String[]{login, password, email} );
+                // В HashM
+                Users.registeredUsers.put(login, password);
                 response.sendRedirect("/project/login?result=Registration+success,+try+login&login=" + request.getParameter("login"));
             }
 
