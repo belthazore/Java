@@ -41,7 +41,7 @@ class Log {
                 logTypeLowerCase,
                 logMsgFinal;
 
-        DateTime = new SimpleDateFormat("dd.MM.yy HH:mm:ss").format(new Date());
+        DateTime = new SimpleDateFormat("dd.MM.yy HH:mm:ss.SSS").format(new Date());
         logTypeLowerCase = logTypeUpperCase.toLowerCase(); // "INFO" >> "info"
         createFILEifNeed(logTypeLowerCase);
         logMsgFinal = "[" + DateTime + "] " + logTypeUpperCase + "  " + logMsg + "\n";
