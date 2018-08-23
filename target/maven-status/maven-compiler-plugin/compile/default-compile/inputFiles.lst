@@ -1,6 +1,7 @@
-/home/nnm/spring/initial/src/main/java/hello/Application.java
-/home/nnm/spring/initial/src/main/java/hello/MyList.java
-/home/nnm/spring/initial/src/main/java/hello/jdbcPostgres.java
-/home/nnm/spring/initial/src/main/java/hello/Greeting.java
-/home/nnm/spring/initial/src/main/java/hello/GreetingController.java
-/home/nnm/spring/initial/src/main/java/hello/Obj.java
+/home/nnm/spring/git/Java/src/main/java/hello/jdbcPostgres.java
+/home/nnm/spring/git/Java/src/main/java/hello/FillDb.java
+/home/nnm/spring/git/Java/src/main/java/hello/Obj.java
+/home/nnm/spring/git/Java/src/main/java/hello/MyList.java
+/home/nnm/spring/git/Java/src/main/java/hello/GreetingController.java
+/home/nnm/spring/git/Java/src/main/java/hello/Greeting.java
+/home/nnm/spring/git/Java/src/main/java/hello/Application.java

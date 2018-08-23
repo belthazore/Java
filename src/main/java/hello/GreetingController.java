@@ -16,19 +16,21 @@ import static java.lang.System.out;
 public class GreetingController {
 
     private final AtomicLong counter = new AtomicLong();
-    private List<Greeting> contactsList = new ArrayList<Greeting>();
+//    private List<Greeting> contactsList = new ArrayList<Greeting>();
 
 
     //REST
     @RequestMapping(value = "/contacts", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     MyList rest(@RequestParam(value = "nameFilter", required = true) String regExpr) {
-        try {
+        List<Greeting> contactsList = new ArrayList<Greeting>();
+/*        try {
             contactsList.add(new Greeting(regExpr));
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { e.printStackTrace(); }*/
 
         // ---------------------------------------------------------------
-        ResultSet rs = jdbcPostgres.select("SELECT * FROM contacts;", new String[]{});
+        jdbcPostgres psql = new jdbcPostgres();
+        ResultSet rs = psql.select("SELECT * FROM contacts;", new String[]{});
         int foundCount = 0; // Количество найденных
 //        String regExpr = "[^A].*";
         out.println("Received 'regExpr': " + regExpr);
@@ -55,6 +57,7 @@ public class GreetingController {
     @RequestMapping(value = "/rest", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     Obj contacts(@RequestParam(value = "nameFilter", required = true) String name) {
+        List<Greeting> contactsList = new ArrayList<Greeting>();
         contactsList.add( new Greeting(name) );
 
         return new Obj(contactsList, contactsList.size());
@@ -63,6 +66,7 @@ public class GreetingController {
     @RequestMapping(value = "/fillDb", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     Obj fillDb(@RequestParam(value = "count", required = true) int count) {
+        List<Greeting> contactsList = new ArrayList<Greeting>();
         contactsList.add(new Greeting(String.valueOf(count)));
 
         FillDb.start(count);
