@@ -17,8 +17,8 @@ public class FillDb {
             String fnameLname = getRandString(getRandOneInt()) + " " + getRandString(getRandOneInt());
             QUERY.append(", ('" + fnameLname + "') ");
             countPg++;
-            if (String.valueOf(countPg).split("0").length > 1)
-                out.println(countPg);
+            /*if (String.valueOf(countPg).split("0").length > 1)
+                out.println(countPg);*/
         }
         jdbcPostgres.execute2(QUERY.toString());
     }
