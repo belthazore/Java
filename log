@@ -1,0 +1,78 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1mBuilding gs-rest-service 0.1.0[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-clean-plugin:3.0.0:clean[m [1m(default-clean)[m @ [36mgs-rest-service[0;1m ---[m
+[[1;34mINFO[m] Deleting /home/nnm/spring/initial/target
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:2.0.3.RELEASE:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mgs-rest-service[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.0.1:resources[m [1m(default-resources)[m @ [36mgs-rest-service[0;1m ---[m
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered resources.
+[[1;34mINFO[m] skip non existing resourceDirectory /home/nnm/spring/initial/src/main/resources
+[[1;34mINFO[m] skip non existing resourceDirectory /home/nnm/spring/initial/src/main/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.7.0:compile[m [1m(default-compile)[m @ [36mgs-rest-service[0;1m ---[m
+[[1;34mINFO[m] Changes detected - recompiling the module!
+[[1;34mINFO[m] Compiling 5 source files to /home/nnm/spring/initial/target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.0.1:testResources[m [1m(default-testResources)[m @ [36mgs-rest-service[0;1m ---[m
+[[1;34mINFO[m] Using 'UTF-8' encoding to copy filtered resources.
+[[1;34mINFO[m] skip non existing resourceDirectory /home/nnm/spring/initial/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.7.0:testCompile[m [1m(default-testCompile)[m @ [36mgs-rest-service[0;1m ---[m
+[[1;34mINFO[m] No sources to compile
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mspring-boot-maven-plugin:2.0.3.RELEASE:run[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mgs-rest-service[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mspring-boot-maven-plugin:2.0.3.RELEASE:run[m [1m(default-cli)[m @ [36mgs-rest-service[0;1m ---[m
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.0.3.RELEASE)
+
+2018-08-18 23:24:33.201  INFO 10990 --- [           main] hello.Application                        : Starting Application on 021h with PID 10990 (/home/nnm/spring/initial/target/classes started by nnm in /home/nnm/spring/initial)
+2018-08-18 23:24:33.207  INFO 10990 --- [           main] hello.Application                        : No active profile set, falling back to default profiles: default
+2018-08-18 23:24:33.287  INFO 10990 --- [           main] ConfigServletWebServerApplicationContext : Refreshing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4dd45a2f: startup date [Sat Aug 18 23:24:33 EEST 2018]; root of context hierarchy
+2018-08-18 23:24:35.514  INFO 10990 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2018-08-18 23:24:35.572  INFO 10990 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2018-08-18 23:24:35.573  INFO 10990 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/8.5.31
+2018-08-18 23:24:35.593  INFO 10990 --- [ost-startStop-1] o.a.catalina.core.AprLifecycleListener   : The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib]
+2018-08-18 23:24:35.722  INFO 10990 --- [ost-startStop-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2018-08-18 23:24:35.723  INFO 10990 --- [ost-startStop-1] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 2449 ms
+2018-08-18 23:24:35.956  INFO 10990 --- [ost-startStop-1] o.s.b.w.servlet.ServletRegistrationBean  : Servlet dispatcherServlet mapped to [/]
+2018-08-18 23:24:35.964  INFO 10990 --- [ost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'characterEncodingFilter' to: [/*]
+2018-08-18 23:24:35.965  INFO 10990 --- [ost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+2018-08-18 23:24:35.965  INFO 10990 --- [ost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'httpPutFormContentFilter' to: [/*]
+2018-08-18 23:24:35.965  INFO 10990 --- [ost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'requestContextFilter' to: [/*]
+2018-08-18 23:24:36.213  INFO 10990 --- [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/**/favicon.ico] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2018-08-18 23:24:36.632  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerAdapter : Looking for @ControllerAdvice: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4dd45a2f: startup date [Sat Aug 18 23:24:33 EEST 2018]; root of context hierarchy
+2018-08-18 23:24:36.788  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/contacts],methods=[GET],produces=[application/json]}" onto public hello.Obj hello.GreetingController.contacts(java.lang.String)
+2018-08-18 23:24:36.790  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/rest],methods=[GET],produces=[application/json]}" onto public hello.MyList hello.GreetingController.rest(java.lang.String)
+2018-08-18 23:24:36.800  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)
+2018-08-18 23:24:36.802  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+2018-08-18 23:24:36.859  INFO 10990 --- [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2018-08-18 23:24:36.860  INFO 10990 --- [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
+2018-08-18 23:24:37.213  INFO 10990 --- [           main] o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
+2018-08-18 23:24:37.299  INFO 10990 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2018-08-18 23:24:37.308  INFO 10990 --- [           main] hello.Application                        : Started Application in 4.917 seconds (JVM running for 12.416)
+2018-08-18 23:24:59.535  INFO 10990 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring FrameworkServlet 'dispatcherServlet'
+2018-08-18 23:24:59.536  INFO 10990 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : FrameworkServlet 'dispatcherServlet': initialization started
+2018-08-18 23:24:59.564  INFO 10990 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : FrameworkServlet 'dispatcherServlet': initialization completed in 28 ms
+[hello.Greeting@f299238]
+2018-08-18 23:25:11.795  INFO 10990 --- [       Thread-2] ConfigServletWebServerApplicationContext : Closing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4dd45a2f: startup date [Sat Aug 18 23:24:33 EEST 2018]; root of context hierarchy
+2018-08-18 23:25:11.800  INFO 10990 --- [       Thread-2] o.s.j.e.a.AnnotationMBeanExporter        : Unregistering JMX-exposed beans on shutdown
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time: 44.605 s
+[[1;34mINFO[m] Finished at: 2018-08-18T23:25:11+03:00
+[[1;34mINFO[m] Final Memory: 38M/134M
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
