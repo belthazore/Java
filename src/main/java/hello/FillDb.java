@@ -8,7 +8,7 @@ public class FillDb {
 
     // Запись N-строк в PostgreSQL
     static void start(int count) {
-        String tableName = "contacts2";
+        String tableName = "contacts";
         StringBuilder QUERY = new StringBuilder().append("INSERT INTO " + tableName + "(name) " +
                 "VALUES ('" + (getRandString(getRandOneInt()) + " " + getRandString(getRandOneInt())) + "')");
 

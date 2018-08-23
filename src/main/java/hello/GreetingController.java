@@ -20,7 +20,7 @@ public class GreetingController {
 
 
     //REST
-    @RequestMapping(value = "/rest", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/contacts", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     MyList rest(@RequestParam(value = "nameFilter", required = true) String regExpr) {
         try {
@@ -52,7 +52,7 @@ public class GreetingController {
         return new MyList(0L, contactsList);
     }
 
-    @RequestMapping(value = "/hello/contacts", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     Obj contacts(@RequestParam(value = "nameFilter", required = true) String name) {
         contactsList.add( new Greeting(name) );

@@ -1,0 +1,8 @@
+
+Заполнить БД 'count' записями - число записей формата'Conor McGregor' в таблицу contacts
+http://localhost:8081/fillDb?count=250000
+
+Поиск в БД клиентов через регулярному приложению
+http://localhost:8081/rest-service/contacts?nameFilter=asasas
+
+
