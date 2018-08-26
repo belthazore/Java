@@ -2,21 +2,32 @@ package hello;
 
 import java.util.List;
 
+// Обертка для JSON
+/*
+{
+    "list":[
+        {
+            "id":1, "val":".."},
+            {"id":1, "val":".."}
+    ]
+
+}
+ */
 public class Obj {
 
-    private List<Greeting> contacts;
-    private long count;
+    private final String result; // Комментарий результата ("Founded more than 10 contacts")
+    private final List<Contact> contacts;
 
-    Obj(List<Greeting> contacts, long count) {
+    public Obj(String result, List<Contact> contacts) {
+        this.result = result;
         this.contacts = contacts;
-        this.count = count;
     }
 
-    public List<Greeting> getContacts() {
+    public String getResult() {
+        return result;
+    }
+
+    public List<Contact> getContacts() {
         return contacts;
     }
-    public long getCount() {
-        return count;
-    }
-
 }

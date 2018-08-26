@@ -1,75 +1,90 @@
 package hello;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.lang.System.out;
 
 @RestController
 public class GreetingController {
 
     private final AtomicLong counter = new AtomicLong();
-//    private List<Greeting> contactsList = new ArrayList<Greeting>();
+    //  private List<Contact> contactsList = new ArrayList<Contact>();
 
 
-    //REST
+    /*
+    REST поиск клиентов в БД по маске RegExp
+
+    ТЗ
+    1. /hello/contacts?nameFilter=^A.*$​ - возвращает контакты, которые НЕ начинаются с A
+    http://localhost:8080/contacts?nameFilter=%5EA.*%24
+
+    2. /hello/contacts?nameFilter=^.*[aei].*$​ - возвращает контакты, которые НЕ содержат букв a, e, i
+    http://localhost:8080/contacts?nameFilter=%5E.*%5Baei%5D.*%24
+
+    */
     @RequestMapping(value = "/contacts", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    MyList rest(@RequestParam(value = "nameFilter", required = true) String regExpr) {
-        List<Greeting> contactsList = new ArrayList<Greeting>();
-/*        try {
-            contactsList.add(new Greeting(regExpr));
-        } catch (Exception e) { e.printStackTrace(); }*/
+    Obj rest(@RequestParam(value = "nameFilter", required = false) String regExpr) {
 
-        // ---------------------------------------------------------------
-        jdbcPostgres psql = new jdbcPostgres();
-        ResultSet rs = psql.select("SELECT * FROM contacts;", new String[]{});
-        int foundCount = 0; // Количество найденных
-//        String regExpr = "[^A].*";
-        out.println("Received 'regExpr': " + regExpr);
-        Pattern pattern = Pattern.compile(regExpr);
-        Matcher match;
-        try {
-            if (rs!=null) {
-                while (rs.next() && foundCount < 10) {
-                    String clientName = rs.getString(2);
-                    match = pattern.matcher(clientName);
-                    if (match.find()) { // Паттерн совпал, найдено имя todo переделать наоборот (ТЗ)
-                        out.println("true: " + clientName);
-                        contactsList.add(new Greeting(clientName));
-                        foundCount++;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        List<Contact> contactsList = Database.searchByRegExp(regExpr);
+
+        // В зависимости от рез-та поиска(колич-ва контактов) сформируем комментарий
+        int contacts = contactsList.size();
+        String result;
+        if (contacts == 0) { //todo брать длинну от возвращенного List от Database
+            throw new ContactsNotFoundException();
+        } else if (contacts == 10) {
+            result = "Founded more than 10 contacts";
+        } else {
+            result = "ok";
         }
-        return new MyList(0L, contactsList);
+
+        return new Obj(result, contactsList);
     }
 
-    @RequestMapping(value = "/rest", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody
-    Obj contacts(@RequestParam(value = "nameFilter", required = true) String name) {
-        List<Greeting> contactsList = new ArrayList<Greeting>();
-        contactsList.add( new Greeting(name) );
 
-        return new Obj(contactsList, contactsList.size());
-    }
-
+    // Заполнить БД записями (при RAM 1Gb в вирт. машине лучше генерить по ~250 000 записей)
     @RequestMapping(value = "/fillDb", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    Obj fillDb(@RequestParam(value = "count", required = true) int count) {
-        List<Greeting> contactsList = new ArrayList<Greeting>();
-        contactsList.add(new Greeting(String.valueOf(count)));
-
+    Body fillDb(@RequestParam(value = "count") int count) {
+        List<Contact> contactsList = new ArrayList<>();
         FillDb.start(count);
-        return new Obj(contactsList, contactsList.size());
+        return new Body(contactsList, contactsList.size());
     }
+
+
+    // Присвоить статус ответу.
+    // 1. Через response
+    @RequestMapping(value = "/status_by_resp", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    Body status_by_resp(HttpServletResponse response) {
+        response.setStatus(504);
+        return new Body(new ArrayList<>(), 0);
+    }
+
+    // 2. Через exception
+    @RequestMapping(value = "/status_by_exception", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    Body status_by_exception() {
+        // тут throw new ..
+        throw new ContactsNotFoundException();
+//        return new Body(new ArrayList<>(), 0);
+    }
+
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "No contacts found")  // 404
+    private class ContactsNotFoundException extends RuntimeException {
+        // ...
+    }
+
+    /*
+    @ResponseStatus(value=HttpStatus. NOT_FOUND, reason="No such Contacts")  // 404
+    private class ContactsNotFoundException extends RuntimeException {
+        // ...
+    }
+    */
 }

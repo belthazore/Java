@@ -54,8 +54,8 @@
 2018-08-18 23:24:35.965  INFO 10990 --- [ost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'requestContextFilter' to: [/*]
 2018-08-18 23:24:36.213  INFO 10990 --- [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/**/favicon.ico] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
 2018-08-18 23:24:36.632  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerAdapter : Looking for @ControllerAdvice: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4dd45a2f: startup date [Sat Aug 18 23:24:33 EEST 2018]; root of context hierarchy
-2018-08-18 23:24:36.788  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/contacts],methods=[GET],produces=[application/json]}" onto public hello.Obj hello.GreetingController.contacts(java.lang.String)
-2018-08-18 23:24:36.790  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/rest],methods=[GET],produces=[application/json]}" onto public hello.MyList hello.GreetingController.rest(java.lang.String)
+2018-08-18 23:24:36.788  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/contacts],methods=[GET],produces=[application/json]}" onto public hello.Body hello.GreetingController.contacts(java.lang.String)
+2018-08-18 23:24:36.790  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/rest],methods=[GET],produces=[application/json]}" onto public hello.Obj hello.GreetingController.rest(java.lang.String)
 2018-08-18 23:24:36.800  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)
 2018-08-18 23:24:36.802  INFO 10990 --- [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
 2018-08-18 23:24:36.859  INFO 10990 --- [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
@@ -66,7 +66,7 @@
 2018-08-18 23:24:59.535  INFO 10990 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring FrameworkServlet 'dispatcherServlet'
 2018-08-18 23:24:59.536  INFO 10990 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : FrameworkServlet 'dispatcherServlet': initialization started
 2018-08-18 23:24:59.564  INFO 10990 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : FrameworkServlet 'dispatcherServlet': initialization completed in 28 ms
-[hello.Greeting@f299238]
+[hello.Contact@f299238]
 2018-08-18 23:25:11.795  INFO 10990 --- [       Thread-2] ConfigServletWebServerApplicationContext : Closing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4dd45a2f: startup date [Sat Aug 18 23:24:33 EEST 2018]; root of context hierarchy
 2018-08-18 23:25:11.800  INFO 10990 --- [       Thread-2] o.s.j.e.a.AnnotationMBeanExporter        : Unregistering JMX-exposed beans on shutdown
 [[1;34mINFO[m] [1m------------------------------------------------------------------------[m
