@@ -2,9 +2,8 @@ package hello;
 
 import java.security.SecureRandom;
 
-import static java.lang.System.out;
 
-public class FillDb {
+class FillDb {
 
     // Запись N-строк в PostgreSQL
     static void start(int count) {
@@ -17,13 +16,11 @@ public class FillDb {
             String fnameLname = getRandString(getRandOneInt()) + " " + getRandString(getRandOneInt());
             QUERY.append(", ('" + fnameLname + "') ");
             countPg++;
-            /*if (String.valueOf(countPg).split("0").length > 1)
-                out.println(countPg);*/
         }
-        jdbcPostgres.execute2(QUERY.toString());
+        jdbcPostgres.fillDb(QUERY.toString());
     }
 
-    // w.o. zero (!)
+    // без цифер 0-3 (!)
     private static int getRandOneInt() {
         String AB = "456789";
         return Integer.parseInt(getRandString(1, AB));

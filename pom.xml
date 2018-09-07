@@ -41,17 +41,20 @@
             <version>9.4-1206-jdbc42</version>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate</groupId>-->
-            <!--<artifactId>hibernate-core</artifactId>-->
-            <!--<version>5.3.3.Final</version>-->
-        <!--</dependency>-->
+        <!--
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.3.3.Final</version>
+        </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate</groupId>-->
-            <!--<artifactId>hibernate-entitymanager</artifactId>-->
-            <!--<version>5.3.3.Final</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.3.3.Final</version>
+        </dependency>
+        -->
+
     </dependencies>
 
     <properties>
@@ -75,7 +78,6 @@
                     <password>admin</password>
                     <url>http://localhost:8080/manager/text</url>
                     <warFile>target/${project.artifactId}-${project.version}.${project.packaging}</warFile>
-                    <!--Bad desission: <warFile>target/project-1.0.war</warFile> -->
                 </configuration>
             </plugin>
         </plugins>
@@ -92,9 +94,9 @@
             <id>tomcat8-maven-plugin</id>
             <url>https://artifacts.alfresco.com/nexus/content/groups/public/</url>
         </pluginRepository>
-        <pluginRepository>
+        <!--<pluginRepository>
             <id>spring-releases</id>
             <url>https://repo.spring.io/libs-release</url>
-        </pluginRepository>
+        </pluginRepository>-->
     </pluginRepositories>
 </project>

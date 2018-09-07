@@ -13,7 +13,8 @@ import java.util.List;
 
 }
  */
-public class Obj {
+public class Obj{
+
 
     private final String result; // Комментарий результата ("Founded more than 10 contacts")
     private final List<Contact> contacts;
