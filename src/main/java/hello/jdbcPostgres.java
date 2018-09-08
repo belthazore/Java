@@ -48,7 +48,8 @@ class jdbcPostgres {
     ResultSet selectById(String QUERY, int id) {
         ResultSet rs = null;
         try {
-            PreparedStatement prepStatement = connection.prepareStatement(QUERY);
+            Connection conn = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
+            PreparedStatement prepStatement = conn.prepareStatement(QUERY);
             prepStatement.setInt(1, id);
             rs = prepStatement.executeQuery();
         } catch (SQLException e) {

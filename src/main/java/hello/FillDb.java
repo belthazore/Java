@@ -7,6 +7,7 @@ class FillDb {
 
     // Запись N-строк в PostgreSQL
     static void start(int count) {
+        jdbcPostgres psql = new jdbcPostgres();
         String tableName = "contacts";
         StringBuilder QUERY = new StringBuilder().append("INSERT INTO " + tableName + "(name) " +
                 "VALUES ('" + (getRandString(getRandOneInt()) + " " + getRandString(getRandOneInt())) + "')");
@@ -17,7 +18,7 @@ class FillDb {
             QUERY.append(", ('" + fnameLname + "') ");
             countPg++;
         }
-        jdbcPostgres.fillDb(QUERY.toString());
+        psql.fillDb(QUERY.toString());
     }
 
     // без цифер 0-3 (!)
