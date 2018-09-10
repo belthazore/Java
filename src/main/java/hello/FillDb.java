@@ -5,20 +5,22 @@ import java.security.SecureRandom;
 
 class FillDb {
 
+    private static String tableName = "contacts";
+
     // Запись N-строк в PostgreSQL
     static void start(int count) {
-        jdbcPostgres psql = new jdbcPostgres();
-        String tableName = "contacts";
         StringBuilder QUERY = new StringBuilder().append("INSERT INTO " + tableName + "(name) " +
                 "VALUES ('" + (getRandString(getRandOneInt()) + " " + getRandString(getRandOneInt())) + "')");
 
         int countPg = 0;
-        while (countPg < count) {
-            String fnameLname = getRandString(getRandOneInt()) + " " + getRandString(getRandOneInt());
-            QUERY.append(", ('" + fnameLname + "') ");
-            countPg++;
+        if (count > 1) { // одна запись уже и так добавлена в запрос, если больше - наполним
+            while (countPg < count) {
+                String fnameLname = getRandString(getRandOneInt()) + " " + getRandString(getRandOneInt());
+                QUERY.append(", ('" + fnameLname + "') ");
+                countPg++;
+            }
         }
-        psql.fillDb(QUERY.toString());
+        jdbcPostgres.fillDb(QUERY.toString());
     }
 
     // без цифер 0-3 (!)

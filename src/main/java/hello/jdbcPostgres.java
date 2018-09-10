@@ -1,25 +1,12 @@
 package hello;
 import java.sql.*;
 
-/*
-    df
-*/
 
 
 
 class jdbcPostgres {
 
-
-    /* Загружаем параметры подключения к БД из конфига
-    private static String DB_DRIVER;
-    private static String DB_ROOT_URL = Configuration.get("db_root_url");
-    private static String DB_DEV = Configuration.get("db_dev");
-    private static String DB_URL = DB_ROOT_URL + DB_DEV;
-    private static String LOGIN = Configuration.get("login");
-    private static String PASSWORD = Configuration.get("password");
-    */
-
-    private static String DB_DRIVER = "org.postgresql.Driver";
+    private String DB_DRIVER = "org.postgresql.Driver";
     private static String DB_ROOT_URL = "jdbc:postgresql://127.0.0.1:5432/";
     private static String DB_DEV = "test_igor";
     private static String DB_URL = DB_ROOT_URL + DB_DEV;
@@ -29,16 +16,14 @@ class jdbcPostgres {
 
 
     private static Connection connection;
-    private Statement statement = null;
+    private static PreparedStatement prepStatement;
+    private static ResultSet resultSet;
 
 
-    jdbcPostgres(){
+    {
         try {
             Class.forName(DB_DRIVER);
-            connection = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
-            statement = connection.createStatement();
-        } catch (SQLException | ClassNotFoundException e) {
-//            Log.error("jdbcPostgres: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -46,47 +31,19 @@ class jdbcPostgres {
 
     // Поиск контакта по ID
     ResultSet selectById(String QUERY, int id) {
-        ResultSet rs = null;
         try {
-            Connection conn = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
-            PreparedStatement prepStatement = conn.prepareStatement(QUERY);
+            prepStatement = getPrepStatement(QUERY);
             prepStatement.setInt(1, id);
-            rs = prepStatement.executeQuery();
+            resultSet = prepStatement.executeQuery();
         } catch (SQLException e) {
-//          Log.error(e.getMessage() + "Query: " + QUERY);
             e.printStackTrace();
         }
-        return rs;
+        return resultSet;
     }
-
-    // Для добавления 3kk записей в contacts
-    static void fillDb(String QUERY) {
-        Connection conn = null;
-
-        try {
-            conn = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
-            PreparedStatement prepStatement = conn.prepareStatement(QUERY);
-            prepStatement.execute();
-        } catch (SQLException e) {
-//            Log.error(e.getMessage() + "Query: " + QUERY);
-            e.printStackTrace();
-        } finally {
-            if (conn != null)
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-        }
-    }
-
 
     ResultSet select(String QUERY, String[] params) {
-        Connection conn;
-        ResultSet resultSet = null;
         try {
-            conn = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
-            PreparedStatement prepStatement = conn.prepareStatement(QUERY);
+            prepStatement = getPrepStatement(QUERY);
             int ind = 1; // порядковый номер элемента в запросе
             for (String par : params) {
                 prepStatement.setString(ind, par);
@@ -94,29 +51,53 @@ class jdbcPostgres {
             }
             resultSet = prepStatement.executeQuery();
         } catch (SQLException e) {
-//            Log.error(e.getMessage() + "Query: " + QUERY);
             e.printStackTrace();
         }
         return resultSet;
     }
 
+    // Для добавления 3kk записей в contacts
+    static void fillDb(String QUERY) {
+        try {
+            prepStatement = getPrepStatement(QUERY);
+            prepStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+    }
+
+
+    private static PreparedStatement getPrepStatement(String QUERY) {
+        PreparedStatement prepState = null;
+        try {
+            connection = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
+            prepState = connection.prepareStatement(QUERY);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return prepState;
+    }
+
 
     /*
-    void closeConnection() {
+    Закрыть: connection, prepStatement, resultSet
+    */
+    static void close() {
         try {
-            if (statement != null) {
-                statement.close();
-            }
             if (connection != null) {
                 connection.close();
             }
-
+            if (prepStatement != null) {
+                prepStatement.close();
+            }
+            if (resultSet != null) {
+                resultSet.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    */
-
 
 }
-

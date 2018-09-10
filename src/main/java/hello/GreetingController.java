@@ -25,6 +25,9 @@ public class GreetingController {
     http://localhost:8080/search_by_id?id=1                                (для spring-boot:run)
     http://localhost:8080/hello/search_by_id?id=1                          (для tomcat8:redeploy)
 
+    fillDb
+    curl http://localhost:8080/fillDb?count=1                              (для spring-boot:run)
+    curl http://localhost:8080/hello/fillDb?count=1                        (для tomcat8:redeploy)
     */
     @RequestMapping(value = "/contacts", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody

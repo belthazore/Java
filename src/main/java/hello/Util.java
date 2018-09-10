@@ -17,10 +17,12 @@ import static java.lang.System.out;
 */
 
 class Util {
-    private static jdbcPostgres psql = new jdbcPostgres();
+
+    private static jdbcPostgres psql;
 
     // Найти контакты не соответствующие маске 'regExp'
     static List<Contact> findByRegExp(String regExp) {
+        psql = new jdbcPostgres();
         List<Contact> contactsList = new ArrayList<>();
 
         ResultSet rs = psql.select("SELECT * FROM contacts", new String[]{});
@@ -47,6 +49,8 @@ class Util {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            psql.close();
         }
 
         return contactsList;
@@ -55,11 +59,10 @@ class Util {
 
     // Найти контакт по 'id'
     static List<Contact> findById(int clientId) {
+        psql = new jdbcPostgres();
         String clientName;
         out.println("Received 'id': " + clientId);
         List<Contact> contactsList = new ArrayList<>();
-
-
         ResultSet rs = psql.selectById("SELECT * FROM contacts WHERE id = ?", clientId);
 
         try {
@@ -69,10 +72,11 @@ class Util {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            psql.close();
         }
 
         return contactsList;
     }
-
 
 }
