@@ -4,8 +4,3 @@ script: mvn clean verify
 branches:
   only:
   - spring-boot
-services:
-  - postgresql
-  env:
-  global:
-  - PGPORT=5432
