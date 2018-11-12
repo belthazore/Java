@@ -39,12 +39,20 @@
   </servlet>
 
   <servlet>
+    <servlet-name>nikacakes</servlet-name>
+    <servlet-class>Nikacakes</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>dbg</servlet-name>
     <servlet-class>Dbg</servlet-class>
   </servlet>
 
 
-
+  <servlet-mapping>
+     <servlet-name>nikacakes</servlet-name>
+     <url-pattern>/n</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>gate</servlet-name>

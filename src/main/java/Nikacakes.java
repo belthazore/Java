@@ -5,22 +5,13 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+//public class Nikacakes {
+//}
 
 
-/*
-  Сюда попадают те, кто успешно авторизовался тут '/login'
-
-Таблицы проекта:
-orders - покупки
-clients - зарегистрированные пользователи
-
-*/
-
-public class Home extends HttpServlet {
+public class Nikacakes extends HttpServlet {
 
     private Map<String, ArrayList<String>> SEARCH_RESULTS = new HashMap<>();
 
@@ -130,47 +121,96 @@ public class Home extends HttpServlet {
                         "         <input name=\"action\" value=\"find\" type=\"hidden\">" +
                         "            <button type=\"submit\" style=\"border-radius: 3px;\">Find</button>" +
                         "        </form>" +
-                        getHistoryByAction("find") +
-                        "    </div>" +
-                        "    <a name=\"create_form\"></a>" + // якорь
-                        "    <div class=\"form\" float=\"right\">" +
-                        "        <b>Create order</b>" +
-                        "        <form action=\"/project/home#create_form\" style=\"width: 300px;margin: auto;\">" +
-                        "            <br><br>" +
-//                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
-                        "            <input name=\"product\" placeholder=\"product\" type=\"text\">" +
-                        "            <input name=\"phone_number\" placeholder=\"client phone\" type=\"text\">" +
-                        "            <br><br>" +
-                        "         <input name=\"action\" value=\"create\" type=\"hidden\">" +
-                        "            <button type=\"submit\" style=\"border-radius: 3px;\">Create</button>" +
-                        "        </form>" +
-                        getHistoryByAction("create") +
-                        "    </div>" +
-                        "  </div>" +
+//                        getHistoryByAction("find") +
+//                        "    </div>" +
+//                        "    <a name=\"create_form\"></a>" + // якорь
+//                        "    <div class=\"form\" float=\"right\">" +
+//                        "        <b>Create order</b>" +
+//                        "        <form action=\"/project/home#create_form\" style=\"width: 300px;margin: auto;\">" +
+//                        "            <br><br>" +
+//                        "            <input name=\"product\" placeholder=\"product\" type=\"text\">" +
+//                        "            <input name=\"phone_number\" placeholder=\"client phone\" type=\"text\">" +
+//                        "            <br><br>" +
+//                        "         <input name=\"action\" value=\"create\" type=\"hidden\">" +
+//                        "            <button type=\"submit\" style=\"border-radius: 3px;\">Create</button>" +
+//                        "        </form>" +
+//                        getHistoryByAction("create") +
+//                        "    </div>" +
+//                        "  </div>" +
+
+                        "  <table width=\"100%\" border=\"1\" cellpadding=\"4\">\n" +
+                        "   <caption>Заказы нах</caption>\n" +
+                        "   <br>\n" +
+                        "   <tr>\n" +
+                        "    <td>№</td>\n" +
+                        "    <th>Телефон</th>\n" +
+                        "    <th>Создан</th>\n" +
+                        "    <th>Отдать</th>\n" +
+                        "    <th>Тело заказа</th>\n" +
+                        "    <th>Коментарий</th>\n" +
+                        "    <th>Статус</th>\n" +
+                        "    <td></td>\n" +
+                        "   </tr>\n" +
+                        "   <tr>\n" +
+                        "    <td>1</td>\n" +
+                        "    <td>0672112508</td>\n" +
+                        "    <td>12/11 10:23</td>\n" +
+                        "    <td>18/11 18:30</td>\n" +
+                        "    <td>Мармелад-400грамм</td>\n" +
+                        "    <td>Опаздала скотина на два часа прошлый раз</td>\n" +
+                        "    <td>Создан</td>\n" +
+//                        "    <td><input onclick=\"location.href='#'\" value=\"Выполнен\" type=\"button\"></td>\n" +
+                        "            <td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>" +
+                        "   </tr>\n" +
+                        "   <tr>\n" +
+                        "    <td>2</td>\n" +
+                        "    <td>0672112008</td>\n" +
+                        "    <td>12/11 12:00</td>\n" +
+                        "    <td>25/11 09:00</td>\n" +
+                        "    <td>Зефир манго-5, Капкейки-14, макаронс-8</td>\n" +
+                        "    <td>Дать три визитки</td>\n" +
+                        "    <td>Создан</td>\n" +
+//                        "    <td><input onclick=\"location.href='#'\" value=\"Выполнен\" type=\"button\"></td>\n" +
+                        "            <td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>" +
+                        "   </tr>\n" +
+                        "   <tr>\n" +
+                        "    <td>3</td>\n" +
+                        "    <td>0951303225</td>\n" +
+                        "    <td>12/11 17:15</td>\n" +
+                        "    <td>28/11 10:00</td>\n" +
+                        "    <td>Торт-2,5 кг.</td>\n" +
+                        "    <td>нифига</td>\n" +
+                        "    <td>Создан</td>\n" +
+//                        "    <td><input onclick=\"location.href='#'\" value=\"Выполнен\" type=\"button\"></td>\n" +
+                        "            <td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>" +
+                        "   </tr>\n" +
+                        doAction("find", new String[]{"1"}) +
+                        "  </table>" +
+                        " </div>" +
                         "</body>";
         PAGE.append(head + body);
         response.getWriter().println(PAGE);
+    }
+
+    // Табличная строка из массива
+    // Example:
+    private String getTableRowFromArray(String []arr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<tr>");
+        for(String cursor : arr){
+            sb.append("<td>");
+            sb.append(cursor);
+            sb.append("</td>");
+        }
+        sb.append("<td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>");
+        sb.append("</tr>");
+        return sb.toString();
     }
 
 
     // Example: 06-07-2018 22:38:28
     private String getDateTimeNow() {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
-    }
-
-    private String getHistoryByAction(String action) {
-        ArrayList<String> arrayListSearchResults = SEARCH_RESULTS.get(action);
-        if (arrayListSearchResults != null) {
-            String buffer =
-                    "<br><br><br>" +
-                            "<b>History</b>" +
-                            "<br>-----------------------------------------------------------------<br><br>";
-            for (Object o : arrayListSearchResults.toArray()) {
-                buffer += o + "<br><br>";
-            }
-            return buffer;
-        } else
-            return "";
     }
 
     private String doAction(String action, String[] params) {
@@ -184,9 +224,20 @@ public class Home extends HttpServlet {
 
             switch (action) {
                 case "find":
-                    ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE order_id='" + params[0] + "'"); //todo inejction
+                    ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'"); //todo inejction
                     rs.next();
-                    result = rs.getString("order_id") + " | " + rs.getString("product") + " | " + rs.getString("client_phone");
+                    String row[]= new String[7];
+                    // id, phone, start_date, end_date, order_content, comment, status
+                    row[0] = String.valueOf(rs.getInt("id"));
+                    row[1] = rs.getString("phone");
+                    Date start = new Date(rs.getLong("start_date")*1000); // Создание даты как "new Date();"
+                    Date end =   new Date(rs.getLong("end_date")  *1000); // Создание даты как "new Date();"
+                    row[2] = new SimpleDateFormat("dd/MM HH:mm").format(start);
+                    row[3] = new SimpleDateFormat("dd/MM HH:mm").format(end);
+                    row[4] = rs.getString("order_content");
+                    row[5] = rs.getString("comment");
+                    row[6] = rs.getString("status");
+                    result = getTableRowFromArray(row);
                     break;
                 case "create":
                     String QueryInsert =
@@ -216,7 +267,7 @@ public class Home extends HttpServlet {
         return
                 "  <style type=\"text/css\">\n" +
                         ".login-page {\n" +
-                        "      width: 800px;\n" +
+                        "      width: 1200px;\n" +
                         "      padding: 8% 0 0;\n" +
                         "      margin: auto;\n" +
                         "    }\n" +
@@ -243,6 +294,7 @@ public class Home extends HttpServlet {
                         "      text-align: center;\n" +
                         "      font-size: 14px;\n" +
                         "    }\n" +
+
                         "    .form button {\n" +
                         "      font-family: \"Roboto\", sans-serif;\n" +
                         "      text-transform: uppercase;\n" +
@@ -260,6 +312,25 @@ public class Home extends HttpServlet {
                         "    .form button:hover,.form button:active,.form button:focus {\n" +
                         "      background: #43A047;\n" +
                         "    }\n" +
+
+                        "    .form button_mini {\n" +
+                        "      font-family: \"Roboto\", sans-serif;\n" +
+                        "      text-transform: uppercase;\n" +
+                        "      outline: 0;\n" +
+                        "      background: #4CAF50;\n" +
+                        "      width: 100%;\n" +
+                        "      border: 0;\n" +
+                        "      padding: 15px;\n" +
+                        "      color: #FFFFFF;\n" +
+                        "      font-size: 13px;\n" +
+                        "      -webkit-transition: all 0.3 ease;\n" +
+                        "      transition: all 0.3 ease;\n" +
+                        "      cursor: pointer;\n" +
+                        "    }\n" +
+                        "    .form button_mini:hover,.form button_mini:active,.form button_mini:focus {\n" +
+                        "      background: #43A047;\n" +
+                        "    }\n" +
+
                         "    .form .message {\n" +
                         "      margin: 15px 0 0;\n" +
                         "      color: #b3b3b3;\n" +
@@ -371,3 +442,4 @@ public class Home extends HttpServlet {
         response.getWriter().println(PAGE);
     }
  */
+

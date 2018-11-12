@@ -149,7 +149,10 @@ public class Main {
             out.println("- - - - - - - - - - - - - - - - - - - - - - - - ");
 
             Date dateNow = new Date();
-            out.println(dateNow);
+            out.println(dateNow.getTime());
+            long l = 1542059563804L;
+            Date d2 = new Date(l*1000);
+            out.println(d2);
             out.println(new SimpleDateFormat("dd-MM-yyyy").format(dateNow));
             out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(dateNow));
 
