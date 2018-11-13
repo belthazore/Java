@@ -27,11 +27,22 @@ function checkParamsIgor() {
     }
 }
 
+// Позволяет использовать кнопку в режиме toggle
+var i = 0;
+
 function enable(){
-	$('#nameIgor').prop({disabled: false});
-	$('#nameIgor1').prop({disabled: false});
-	$('#nameIgor2').prop({disabled: false});
-	// $("input[type='checkbox']").prop({disabled: true})
+    if(i==0){
+        $('#nameIgor').prop({disabled: false});
+        $('#nameIgor1').prop({disabled: false});
+        $('#nameIgor2').prop({disabled: false});
+        i++;
+    } else {
+        $('#nameIgor').prop({disabled: true});
+        $('#nameIgor1').prop({disabled: true});
+        $('#nameIgor2').prop({disabled: true});
+        i--;
+    }
+    // $("input[type='checkbox']").prop({disabled: true})
 }
 </script>
 
