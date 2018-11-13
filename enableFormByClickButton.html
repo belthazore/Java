@@ -1,0 +1,59 @@
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+ 
+<script>
+function checkParams() {
+    var name = $('#name').val();    
+    var sel = $('#sel').val();
+    var select = myForma.mySelect.selectedIndex;
+   
+    if( name.length != 0 || select != 0) {
+        $('#submit').removeAttr('disabled');
+    } else {
+        $('#submit').attr('disabled', 'disabled');
+    }
+}
+
+
+function checkParamsIgor() {
+    var name = $('#name').val();    
+    var sel = $('#sel').val();
+    var select = myForma.mySelect.selectedIndex;
+   
+    if( name.length != 0 || select != 0) {
+        $('#submit').removeAttr('disabled');
+    } else {
+        $('#submit').attr('disabled', 'disabled');
+    }
+}
+
+function enable(){
+	$('#nameIgor').prop({disabled: false});
+	$('#nameIgor1').prop({disabled: false});
+	$('#nameIgor2').prop({disabled: false});
+	// $("input[type='checkbox']").prop({disabled: true})
+}
+</script>
+
+
+<p>
+<form method="post" action="" id="forma" name="myForma">
+ 
+    <input id="name" onkeyup="checkParams()" type="text" placeholder="Введите имя"  autocomplete="off" /><br>
+ 
+    <select id="sel" onChange="checkParams()" name="mySelect">
+        <option selected value="0">Выберите значение</option>
+        <option value="Один">1</option>
+        <option value="Два">2</option>
+    </select>
+ 
+    <input type="button" id="submit" value="Отправить" disabled>
+</form>
+
+<form method="post" action="" id="forma" name="myFormaIgor">
+    <input type="text" id="nameIgor"  placeholder="Я заблочен пока не жмякнешь"  autocomplete="off" disabled /><br>
+    <input type="text" id="nameIgor1" placeholder="Я заблочен пока не жмякнешь"  autocomplete="off" disabled /><br>
+    <input type="text" id="nameIgor2" placeholder="Я заблочен пока не жмякнешь"  autocomplete="off" disabled /><br>
+    <input type="button" onclick="enable()" id="submitIgor" value="Тест">
+</form>    
+</p>
