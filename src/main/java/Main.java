@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -300,6 +301,16 @@ public class Main {
             out.println(timeNow);
 
 
+
+            out.println("\n\n--------------- DIR LS Example ---------------");
+
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+            File folder = new File(".");
+            for (final File fileEntry : Objects.requireNonNull(folder.listFiles())) {
+                System.out.println(fileEntry.getName());
+            }
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
 
         } catch (Exception e) {
