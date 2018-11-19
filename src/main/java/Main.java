@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -296,7 +297,7 @@ public class Main {
             act.run();
             */
 
-            long timeNow = Cookies.getTimeNow();
+            long timeNow = 1532531226359L; // long timeNow = Cookies.getTimeNow();
             out.println(timeNow);
             out.println(timeNow);
 
@@ -310,7 +311,38 @@ public class Main {
             for (final File fileEntry : Objects.requireNonNull(folder.listFiles())) {
                 System.out.println(fileEntry.getName());
             }
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+            long unixNow, unixNowPlus7Day, unix7Days;
+
+            unixNow = new Date().getTime();
+            unix7Days = TimeUnit.HOURS.toMillis(24*7);
+            unixNowPlus7Day = unixNow + unix7Days;
+
+            out.println(System.currentTimeMillis());
+            out.println(dateNow.getTime());
+
+            out.println("Now: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(dateNow));
+            long nowPlus7D = dateNow.getTime() + unix7Days;
+            out.println("No2: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(nowPlus7D));
+
+//            String response = doAction("find", new String[]{"1"});
+//            out.println(response);
+
+
+
+            jdbcPostgres.execute("SELECT * FROM orders", new String[]{});
+
+            String result = null;
+            jdbcPostgres psql = new jdbcPostgres();
+            String query = "SELECT * FROM orders WHERE id='1'";
+            ResultSet rs = psql.executeSelect(query);
+            rs.next();
+            out.println(rs.getInt("id"));
+
+
+
+
 
 
         } catch (Exception e) {
@@ -515,4 +547,70 @@ static class TenMinutesThread implements Runnable {
         }
     }
 }
+
+    public static String doAction(String action, String[] params) {
+        // params[] в зависимости от action
+        // find:   ["1"]
+        // create: ["Merenga: 10 pcs", "0671234567"]
+        String result = null;
+        jdbcPostgres psql = null;
+        try {
+            psql = new jdbcPostgres();
+
+            switch (action) {
+                case "find":
+                    String query = "SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'";
+                    ResultSet rs = psql.executeSelect(query); //todo inejction
+                    rs.next();
+                    String row[]= new String[7];
+                    // id, phone, start_date, end_date, order_content, comment, status
+                    row[0] = String.valueOf(rs.getInt("id"));
+                    row[1] = rs.getString("phone");
+                    Date start = new Date(rs.getLong("start_date")*1000); // Создание даты как "new Date();"
+                    Date end =   new Date(rs.getLong("end_date")  *1000); // Создание даты как "new Date();"
+                    row[2] = new SimpleDateFormat("dd/MM HH:mm").format(start);
+                    row[3] = new SimpleDateFormat("dd/MM HH:mm").format(end);
+                    row[4] = rs.getString("order_content");
+                    row[5] = rs.getString("comment");
+                    row[6] = rs.getString("status");
+                    result = getTableRowFromArray(row);
+                    break;
+                case "create":
+                    String QueryInsert =
+                            "INSERT INTO orders" +
+                                    "  (order_id, product, client_phone)" +
+                                    "VALUES" +
+                                    "  (nextval('orders_order_id_seq'), '" + params[0] + "', '" + params[1] + "')"; // RUTRNUNG
+                    psql.executeSelect(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
+                    ResultSet rs2 = psql.executeSelect("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
+                    rs2.next();
+                    result = rs2.getString(1) + " | " + params[0] + " | " + params[1];
+                    break;
+                default:
+                    throw new Exception("Wrong action");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (psql != null)
+                psql.closeConnection();
+        }
+        return result;
+    }
+
+
+    private static String getTableRowFromArray(String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<tr>");
+        for(String cursor : arr){
+            sb.append("<td>");
+            sb.append(cursor);
+            sb.append("</td>");
+        }
+        sb.append("<td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>");
+        sb.append("</tr>");
+        return sb.toString();
+    }
+
+
 }

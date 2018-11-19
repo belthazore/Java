@@ -18,24 +18,10 @@ public class Nikacakes extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        if (Cookies.cookiesAndSavingTime.isEmpty() || !Cookies.haveValidCookie(request)) { // Не валидна или ее вообще нет
-            response.sendRedirect("/project/login");
-        }
-
-        /*
-        Интересный BUG (fixed)
-        Суть:
-        даже при отработке true в 23 строке этого класса Redirect не происходит(!), выполнение доходит до
-        Cookies.updateSavingTimeIfNeed(request) - парадокс!
-
-        0. Убрать if проверку в Cookies USTIN на наличие куки в HashM
-        1. redeploy
-        2. В БД, 'cooks' ничего нет, в HashM тоже
-        3. Переходим 'localhost:8080/project/home'
-        4. java.lang.NullPointerException
-                Cookies.updateSavingTimeIfNeed(Cookies.java:103)
-                Home.doGet(Home.java:29)
-        */
+        // todo: RAD
+//        if (Cookies.cookiesAndSavingTime.isEmpty() || !Cookies.haveValidCookie(request)) { // Не валидна или ее вообще нет
+//            response.sendRedirect("/project/login");
+//        }
 
 
 
@@ -72,7 +58,7 @@ public class Nikacakes extends HttpServlet {
 
 
 
-        Cookies.updateSavingTimeIfNeed(request);
+//        Cookies.updateSavingTimeIfNeed(request);
 
         // Запишем успешную авторизацию
         Log.transition("Home. Logined with cookie success", request);
@@ -112,15 +98,7 @@ public class Nikacakes extends HttpServlet {
 
                         "  <div class=\"login-page\">" +
                         "    <div class=\"form\"  float=\"left\">" +
-                        "    <a name=\"find_form\"></a>" + // якорь
-                        "        <b>Find order</b>" +
-                        "        <form action=\"/project/home#find_form\" style=\"width: 300px;margin: auto;\">" +
-                        "            <br><br>" +
-                        "            <input name=\"order_id\" placeholder=\"order_id\" type=\"text\">" +
-                        "            <br><br>" +
-                        "         <input name=\"action\" value=\"find\" type=\"hidden\">" +
-                        "            <button type=\"submit\" style=\"border-radius: 3px;\">Find</button>" +
-                        "        </form>" +
+
 //                        getHistoryByAction("find") +
 //                        "    </div>" +
 //                        "    <a name=\"create_form\"></a>" + // якорь
@@ -139,8 +117,8 @@ public class Nikacakes extends HttpServlet {
 //                        "  </div>" +
 
                         "  <table width=\"100%\" border=\"1\" cellpadding=\"4\">\n" +
-                        "   <caption>Заказы нах</caption>\n" +
-                        "   <br>\n" +
+                        "   <b>Заказы</b>" +
+                        "   <br><br>" +
                         "   <tr>\n" +
                         "    <td>№</td>\n" +
                         "    <th>Телефон</th>\n" +
@@ -149,43 +127,23 @@ public class Nikacakes extends HttpServlet {
                         "    <th>Тело заказа</th>\n" +
                         "    <th>Коментарий</th>\n" +
                         "    <th>Статус</th>\n" +
-                        "    <td></td>\n" +
+                        "    <th>Действие</th>\n" +
                         "   </tr>\n" +
-                        "   <tr>\n" +
-                        "    <td>1</td>\n" +
-                        "    <td>0672112508</td>\n" +
-                        "    <td>12/11 10:23</td>\n" +
-                        "    <td>18/11 18:30</td>\n" +
-                        "    <td>Мармелад-400грамм</td>\n" +
-                        "    <td>Опаздала скотина на два часа прошлый раз</td>\n" +
-                        "    <td>Создан</td>\n" +
-//                        "    <td><input onclick=\"location.href='#'\" value=\"Выполнен\" type=\"button\"></td>\n" +
-                        "            <td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>" +
-                        "   </tr>\n" +
-                        "   <tr>\n" +
-                        "    <td>2</td>\n" +
-                        "    <td>0672112008</td>\n" +
-                        "    <td>12/11 12:00</td>\n" +
-                        "    <td>25/11 09:00</td>\n" +
-                        "    <td>Зефир манго-5, Капкейки-14, макаронс-8</td>\n" +
-                        "    <td>Дать три визитки</td>\n" +
-                        "    <td>Создан</td>\n" +
-//                        "    <td><input onclick=\"location.href='#'\" value=\"Выполнен\" type=\"button\"></td>\n" +
-                        "            <td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>" +
-                        "   </tr>\n" +
-                        "   <tr>\n" +
-                        "    <td>3</td>\n" +
-                        "    <td>0951303225</td>\n" +
-                        "    <td>12/11 17:15</td>\n" +
-                        "    <td>28/11 10:00</td>\n" +
-                        "    <td>Торт-2,5 кг.</td>\n" +
-                        "    <td>нифига</td>\n" +
-                        "    <td>Создан</td>\n" +
-//                        "    <td><input onclick=\"location.href='#'\" value=\"Выполнен\" type=\"button\"></td>\n" +
-                        "            <td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>" +
-                        "   </tr>\n" +
-                        doAction("find", new String[]{"1"}) +
+                        doAction("findAllCreated", new String[]{}) +
                         "  </table>" +
+                        "<br><br><br>" +
+
+// id, phone, start_date, end_date, order_content, comment, status
+                        "<div>" +
+                        "<b>Добавление заказа</b><br>" +
+                        "<form action=\"" + "#" + "\">" + //request.getRequestURL()
+
+                        "Телефон <input type=\"text\" name=\"phone\" value=\"\">  " +
+                        "Дата конца<input type=\"text\" name=\"product\" value=\"\">" +
+                        "Тело заказа <input type=\"text\" name=\"order_content\" value=\"\">" +
+                        "Коментарий <input type=\"text\" name=\"comment\" value=\"\">" +
+                        " <br><input type=\"submit\" value=\"Добавить\"> </form><br><br>" +
+                        "  </div>" +
                         " </div>" +
                         "</body>";
         PAGE.append(head + body);
@@ -202,7 +160,7 @@ public class Nikacakes extends HttpServlet {
             sb.append(cursor);
             sb.append("</td>");
         }
-        sb.append("<td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>");
+        sb.append("<td align=\"center\"><a href=\"#\">Выполнить</a></td>");
         sb.append("</tr>");
         return sb.toString();
     }
@@ -213,16 +171,33 @@ public class Nikacakes extends HttpServlet {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
     }
 
-    private String doAction(String action, String[] params) {
+    public String doAction(String action, String[] params) {
         // params[] в зависимости от action
         // find:   ["1"]
         // create: ["Merenga: 10 pcs", "0671234567"]
-        String result = null;
+        StringBuilder result = new StringBuilder();
         jdbcPostgres psql = null;
         try {
             psql = new jdbcPostgres();
 
             switch (action) {
+                case "findAllCreated":
+                    ResultSet rs0 = psql.executeSelect("SELECT * FROM orders WHERE status = 'Created'"); //todo inejction
+                    while(rs0.next()){
+                        String row[]= new String[7];
+                        // id, phone, start_date, end_date, order_content, comment, status
+                        row[0] = String.valueOf(rs0.getInt("id"));
+                        row[1] = rs0.getString("phone");
+                        Date start = new Date(rs0.getLong("start_date")*1000); // Создание даты как "new Date();"
+                        Date end =   new Date(rs0.getLong("end_date")  *1000); // Создание даты как "new Date();"
+                        row[2] = new SimpleDateFormat("dd/MM HH:mm").format(start);
+                        row[3] = new SimpleDateFormat("dd/MM HH:mm").format(end);
+                        row[4] = rs0.getString("order_content");
+                        row[5] = rs0.getString("comment");
+                        row[6] = rs0.getString("status");
+                        result.append(getTableRowFromArray(row));
+                    }
+                    break;
                 case "find":
                     ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'"); //todo inejction
                     rs.next();
@@ -237,7 +212,7 @@ public class Nikacakes extends HttpServlet {
                     row[4] = rs.getString("order_content");
                     row[5] = rs.getString("comment");
                     row[6] = rs.getString("status");
-                    result = getTableRowFromArray(row);
+                    result = new StringBuilder(getTableRowFromArray(row));
                     break;
                 case "create":
                     String QueryInsert =
@@ -248,7 +223,7 @@ public class Nikacakes extends HttpServlet {
                     psql.executeSelect(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
                     ResultSet rs2 = psql.executeSelect("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
                     rs2.next();
-                    result = rs2.getString(1) + " | " + params[0] + " | " + params[1];
+                    result = new StringBuilder(rs2.getString(1) + " | " + params[0] + " | " + params[1]);
                     break;
                 default:
                     throw new Exception("Wrong action");
@@ -259,7 +234,7 @@ public class Nikacakes extends HttpServlet {
             if (psql != null)
                 psql.closeConnection();
         }
-        return result;
+        return result.toString();
     }
 
     // TODO: решить проблему добавления через "link rel"
