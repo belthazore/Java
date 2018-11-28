@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -339,6 +340,10 @@ public class Main {
             ResultSet rs = psql.executeSelect(query);
             rs.next();
             out.println(rs.getInt("id"));
+
+            out.println(Timestamp.valueOf(String.valueOf(System.currentTimeMillis())));
+
+
 
 
 

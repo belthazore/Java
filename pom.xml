@@ -61,8 +61,8 @@
                 <version>3.0-r1655215</version>
                 <configuration>
                     <server>TomcatServer</server>
-                    <username>tomcat</username>
-                    <password>s3cret</password>
+                    <username>admin</username>
+                    <password>admin</password>
                     <url>http://localhost:8080/manager/text</url>
                     <warFile>target/${project.artifactId}-${project.version}.${project.packaging}</warFile>
                     <!--Bad desission: <warFile>target/project-1.0.war</warFile> -->

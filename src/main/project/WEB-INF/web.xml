@@ -49,10 +49,15 @@
   </servlet>
 
 
+
+
+
+
   <servlet-mapping>
      <servlet-name>nikacakes</servlet-name>
      <url-pattern>/n</url-pattern>
   </servlet-mapping>
+
 
   <servlet-mapping>
     <servlet-name>gate</servlet-name>

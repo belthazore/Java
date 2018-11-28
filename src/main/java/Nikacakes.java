@@ -21,8 +21,6 @@ public class Nikacakes extends HttpServlet {
 //        }
 
 
-
-
         String action, orderId, product, phoneNumber; // проверенные параметры (!"" | "")
         String actionNeedCheck, orderIdNeedCheck, productNeedCheck, phoneNumberNeedCheck; // параметры для проверки, могут быть == null
 
@@ -45,14 +43,13 @@ public class Nikacakes extends HttpServlet {
 
         // Операция выхода из кабинета
         // todo забиндить под 'a href'
-        if(action.equals("exit")){
+        if (action.equals("exit")) {
             Cookies.deleteFromDbAndHashM(request);
             HttpSession session = request.getSession();
             session.invalidate();
             response.sendRedirect("/project/");
             return;
         }
-
 
 
 //        Cookies.updateSavingTimeIfNeed(request);
@@ -71,7 +68,6 @@ public class Nikacakes extends HttpServlet {
                         "</head>";
 
 
-
         // выполнение действий и сохранение их результатов в историю HashMap
         // TODO: сохранять по логину пользователя историю индивидуально
         if (action.equals("find") | action.equals("create")) {
@@ -85,7 +81,6 @@ public class Nikacakes extends HttpServlet {
                 SEARCH_RESULTS.put(action, tempArrList);
             }
         }
-
 
 
         String body =
@@ -120,37 +115,49 @@ public class Nikacakes extends HttpServlet {
                         "                <th align=\"right\">Дейс</th>" +
                         "                <th align=\"left\">твие</th>" +
                         "            </tr>" +
-                        "            <tr>" +
-                        "                <td>1</td>" +
-                        "                <td>0672112508</td>" +
-                        "                <td>5.12</td>" +
-                        "                <td>10.12</td>" +
-                        "                <td align=\"left\">Зефир манго-5, Капкейки-14, макаронс-8</td>" +
-                        "                <td align=\"left\">на 07:30 бля, муж снова будет ругаться</td>" +
-                        "                <td>Создан</td>" +
-                        "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Изменить\" type=\"button\"></td>" +
-                        "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Выполнить\" type=\"button\"></td>" +
-                        "            </tr>" +
-                        "            <tr>" +
-                        "                <td>2</td>" +
-                        "                <td>0672112508</td>" +
-                        "                <td>1.11</td>" +
-                        "                <td>1.12</td>" +
-                        "                <td align=\"left\">Зефир-5, макаронс-25</td>" +
-                        "                <td align=\"left\">Коментарий опять</td>" +
-                        "                <td>Создан</td>" +
-                        "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Изменить\" type=\"button\"></td>" +
-                        "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Выполнить\" type=\"button\"></td>" +
-                        "            </tr>" +
+                        doAction("findAllCreated", new String[]{}) +
                         "            </tbody>" +
                         "        </table>" +
                         "        <br><br><br>" +
                         "</div>" +
                         "" +
                         "" +
+                        "" +
+                        "<div class=\"block\">" +
+                        "    <a name=\"add\"/>" +
+                        "    <b class=\"title\">Добавить</b>" +
+                        "    <br><br><br>" +
+                        "    <table width=\"100%\" border=\"1\" cellpadding=\"4\">" +
+                        "        <tbody>" +
+                        "        <tr>" +
+                        "            <th>№</th>" +
+                        "            <th>Телефон</th>" +
+                        "            <th>Создан</th>" +
+                        "            <th>Отдать</th>" +
+                        "            <th>Тело заказа</th>" +
+                        "            <th>Коментарий</th>" +
+                        "            <th>Статус</th>" +
+                        "            <td align=\"center\" rowspan=\"2\"><input onclick=\"location.href=/project/n\" value=\"Добавить\" type=\"button\" class=\"button2\"></td>" +
+                        "        </tr>" +
+                        "        <tr>" +
+                        "            <td><input type=\"text\" name=\"id\" 		 value=\"1\">			 </td>" +
+                        "            <td><input type=\"text\" name=\"phone\" 	 value=\"0672112508\"> </td>" +
+                        "            <td><input type=\"text\" name=\"start_date\" value=\"5.12\">		 </td>" +
+                        "            <td><input type=\"text\" name=\"end_date\" 	 value=\"15.12\">		 </td>" +
+                        "            <td><textarea type=\"text\" name=\"body\" 	 value=\"Зефир манго-5, Капкейки-14, макаронс-8\" align=\"left\"></textarea></td>" +
+                        "            <td><textarea type=\"text\" name=\"comment\" value=\"Коментарий\" align=\"left\"></textarea></td>" +
+                        "            <td><input type=\"text\" name=\"status\" 	 value=\"Создан\">			 </td>" +
+                        "" +
+                        "        </tr>" +
+                        "        </tbody>" +
+                        "    </table>" +
+                        "</div>" +
+                        "" +
+                        "" +
+                        "" +
                         "<div class=\"block\">" +
                         "    <a name=\"search\">" +
-                        "        <b class=\"title\">Поиск</b>" +
+                        "        <b class=\"title\">Найти</b>" +
                         "        <br><br><br>" +
                         "        <table width=\"1200\" border=\"1\" cellpadding=\"4\">" +
                         "            <tbody>" +
@@ -165,12 +172,12 @@ public class Nikacakes extends HttpServlet {
                         "                <!-- <td align=\"center\" rowspan=\"2\"><a href=\"http://localhost:8080/project/n#\">Найти</a></td> -->" +
                         "            </tr>" +
                         "            <tr style=\"height: 50px;\">" +
-                        "                <td><input type=\"text\" name=\"id\" 		 value=\"1\">			 </td>" +
-                        "                <td><input type=\"text\" name=\"phone\" 	 value=\"0672112508\"> </td>" +
-                        "                <td><input type=\"text\" name=\"start_date\" value=\"5.12\">		 </td>" +
-                        "                <td><input type=\"text\" name=\"end_date\" 	 value=\"15.12\">		 </td>" +
-                        "                <td><input type=\"text\" name=\"comment\" 	 value=\"comment\">	 </td>" +
-                        "                <td><input type=\"text\" name=\"status\" 	 value=\"\">			 </td>" +
+                        "                <td><input type=\"text\" name=\"id\" value=\"1\"></td>" +
+                        "                <td><input type=\"text\" name=\"phone\" value=\"0672112508\"></td>" +
+                        "                <td><input type=\"text\" name=\"start_date\" value=\"5.12\"></td>" +
+                        "                <td><input type=\"text\" name=\"end_date\" value=\"15.12\"></td>" +
+                        "                <td><input type=\"text\" name=\"comment\" value=\"comment\"></td>" +
+                        "                <td><input type=\"text\" name=\"status\" value=\"\"></td>" +
                         "            </tr>" +
                         "            </tbody>" +
                         "        </table>" +
@@ -180,7 +187,7 @@ public class Nikacakes extends HttpServlet {
                         "" +
                         "<div class=\"block\">" +
                         "    <a name=\"change\"/>" +
-                        "    <b class=\"title\">Изменение</b>" +
+                        "    <b class=\"title\">Изменить</b>" +
                         "    <br><br><br>" +
                         "    <table width=\"100%\" border=\"1\" cellpadding=\"4\">" +
                         "        <tbody>" +
@@ -195,13 +202,13 @@ public class Nikacakes extends HttpServlet {
                         "            <td align=\"center\" rowspan=\"2\"><input onclick=\"location.href=/project/n\" value=\"Сохранить\" type=\"button\" class=\"button2\"></td>" +
                         "        </tr>" +
                         "        <tr>" +
-                        "            <td><input type=\"text\" name=\"id\" 		 value=\"1\">			 </td>" +
-                        "            <td><input type=\"text\" name=\"phone\" 	 value=\"0672112508\"> </td>" +
-                        "            <td><input type=\"text\" name=\"start_date\" value=\"5.12\">		 </td>" +
-                        "            <td><input type=\"text\" name=\"end_date\" 	 value=\"15.12\">		 </td>" +
-                        "            <td><textarea type=\"text\" name=\"body\" 	 value=\"Зефир манго-5, Капкейки-14, макаронс-8\" align=\"left\"></textarea></td>" +
+                        "            <td><input type=\"text\" name=\"id\" value=\"1\"> </td>" +
+                        "            <td><input type=\"text\" name=\"phone\" value=\"0672112508\"> </td>" +
+                        "            <td><input type=\"text\" name=\"start_date\" value=\"5.12\"></td>" +
+                        "            <td><input type=\"text\" name=\"end_date\" value=\"15.12\"></td>" +
+                        "            <td><textarea type=\"text\" name=\"body\" value=\"Зефир манго-5, Капкейки-14, макаронс-8\" align=\"left\"></textarea></td>" +
                         "            <td><textarea type=\"text\" name=\"comment\" value=\"Коментарий\" align=\"left\"></textarea></td>" +
-                        "            <td><input type=\"text\" name=\"status\" 	 value=\"Создан\">			 </td>" +
+                        "            <td><input type=\"text\" name=\"status\" value=\"Создан\"></td>" +
                         "" +
                         "            <!-- 					<td align=\"center\"><a href=\"http://localhost:8080/project/n#\">Изменить</a></td>" +
                         "                                <td align=\"center\"><a href=\"http://localhost:8080/project/n#\">Выполнить</a></td> -->" +
@@ -209,8 +216,7 @@ public class Nikacakes extends HttpServlet {
                         "        </tbody>" +
                         "    </table>" +
                         "</div>" +
-                "</body>";
-// doAction("findAllCreated", new String[]{}) +
+                        "</body>";
         PAGE.append(head + body);
         response.getWriter().println(PAGE);
     }
@@ -218,30 +224,35 @@ public class Nikacakes extends HttpServlet {
 
     String s = // todo: remove me
             "            <tr>" +
-            "                <td>1</td>" +
-            "                <td>0672112508</td>" +
-            "                <td>5.12</td>" +
-            "                <td>10.12</td>" +
-            "                <td align=\"left\">Зефир манго-5, Капкейки-14, макаронс-8</td>" +
-            "                <td align=\"left\">на 07:30 бля, муж снова будет ругаться</td>" +
-            "                <td>Создан</td>" +
-            "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Изменить\" type=\"button\"></td>" +
-            "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Выполнить\" type=\"button\"></td>" +
-            "            </tr>";
+                    "                <td>1</td>" +
+                    "                <td>0672112508</td>" +
+                    "                <td>5.12</td>" +
+                    "                <td>10.12</td>" +
+                    "                <td align=\"left\">Зефир манго-5, Капкейки-14, макаронс-8</td>" +
+                    "                <td align=\"left\">на 07:30 бля, муж снова будет ругаться</td>" +
+                    "                <td>Создан</td>" +
+                    "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Изменить\" type=\"button\"></td>" +
+                    "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Выполнить\" type=\"button\"></td>" +
+                    "            </tr>";
+
     // Табличная строка из массива
     // Example:
-    private String getTableRowFromArray(String []arr) {
+    private String getTableRowFromArray(String[] arr, String tableName) {
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        for(int c = 0; c<arr.length; c++){
-            if (c==4 | c==5){
-
+        for (int c = 0; c < arr.length; c++) {
+            if (c == 4 | c == 5) { // Для тела заказа и коментария выравнивание "влево"
+                sb.append("<td align=\"left\">");
+            } else {
+                sb.append("<td>");
             }
-            sb.append("<td>");
             sb.append(arr[c]);
             sb.append("</td>");
         }
-        sb.append("<td align=\"center\"><a href=\"#\">Выполнить</a></td>");
+        if (tableName.equals("All")) { // Для каждой таблицы свои кнопки
+            sb.append("<td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Изменить\" type=\"button\"></td>");
+            sb.append("<td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Выполнить\" type=\"button\"></td>");
+        }
         sb.append("</tr>");
         return sb.toString();
     }
@@ -252,7 +263,7 @@ public class Nikacakes extends HttpServlet {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
     }
 
-    public String doAction(String action, String[] params) {
+    private String doAction(String action, String[] params) {
         // params[] в зависимости от action
         // find:   ["1"]
         // create: ["Merenga: 10 pcs", "0671234567"]
@@ -263,38 +274,38 @@ public class Nikacakes extends HttpServlet {
             switch (action) {
                 case "findAllCreated":
                     ResultSet rs0 = psql.executeSelect("SELECT * FROM orders WHERE status = 'Создан'"); //todo inejction
-                    while(rs0.next()){
-                        String row[]= new String[7];
+                    while (rs0.next()) {
+                        String rowArr[] = new String[7];
                         // id, phone, start_date, end_date, order_content, comment, status
-                        row[0] = String.valueOf(rs0.getInt("id"));
-                        row[1] = rs0.getString("phone");
-                        Date start = new Date(rs0.getLong("start_date")*1000); // Создание даты как "new Date();"
-                        Date end =   new Date(rs0.getLong("end_date")  *1000); // Создание даты как "new Date();"
-                        row[2] = new SimpleDateFormat("dd.MM").format(start);
-                        row[3] = new SimpleDateFormat("dd.MM").format(end);
-                        row[4] = rs0.getString("order_content");
-                        row[5] = rs0.getString("comment");
-                        row[6] = rs0.getString("status");
-                        result.append(getTableRowFromArray(row));
+                        rowArr[0] = String.valueOf(rs0.getInt("id"));
+                        rowArr[1] = rs0.getString("phone");
+                        Date start = new Date(rs0.getLong("start_date") * 1000); // Создание даты как "new Date();"
+                        Date end = new Date(rs0.getLong("end_date") * 1000); // Создание даты как "new Date();"
+                        rowArr[2] = new SimpleDateFormat("dd.MM").format(start);
+                        rowArr[3] = new SimpleDateFormat("dd.MM").format(end);
+                        rowArr[4] = rs0.getString("order_content");
+                        rowArr[5] = rs0.getString("comment");
+                        rowArr[6] = rs0.getString("status");
+                        result.append(getTableRowFromArray(rowArr, "All"));
                     }
                     break;
                 case "find":
                     ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'"); //todo inejction
                     rs.next();
-                    String row[]= new String[7];
+                    String row[] = new String[7];
                     // id, phone, start_date, end_date, order_content, comment, status
                     row[0] = String.valueOf(rs.getInt("id"));
                     row[1] = rs.getString("phone");
-                    Date start = new Date(rs.getLong("start_date")*1000); // Создание даты как "new Date();"
-                    Date end =   new Date(rs.getLong("end_date")  *1000); // Создание даты как "new Date();"
-                    row[2] = new SimpleDateFormat("dd/MM HH:mm").format(start);
-                    row[3] = new SimpleDateFormat("dd/MM HH:mm").format(end);
+                    Date start = new Date(rs.getLong("start_date") * 1000); // Создание даты как "new Date();"
+                    Date end = new Date(rs.getLong("end_date") * 1000); // Создание даты как "new Date();"
+                    row[2] = new SimpleDateFormat("dd.MM").format(start);
+                    row[3] = new SimpleDateFormat("dd.MM").format(end);
                     row[4] = rs.getString("order_content");
                     row[5] = rs.getString("comment");
                     row[6] = rs.getString("status");
-                    result = new StringBuilder(getTableRowFromArray(row));
+                    result = new StringBuilder(getTableRowFromArray(row, "All"));
                     break;
-                case "create":
+                case "add":
                     String QueryInsert =
                             "INSERT INTO orders" +
                                     "  (order_id, product, client_phone)" +
@@ -304,9 +315,13 @@ public class Nikacakes extends HttpServlet {
                     ResultSet rs2 = psql.executeSelect("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
                     rs2.next();
                     result = new StringBuilder(rs2.getString(1) + " | " + params[0] + " | " + params[1]);
+                    String query = "" +
+                    "INSERT INTO orders(phone, start_date, end_date, order_content, comment, status)" +
+                        "VALUES" +
+                            "('0672112008', 1542059302829, 1542059402829, 'Зефир-5, макаронс-25', 'Коментарий опять', 'Создан')";
                     break;
                 default:
-                    throw new Exception("Wrong action");
+                throw new Exception("Wrong action");
             }
         } catch (Exception e) {
             e.printStackTrace();
