@@ -3,29 +3,13 @@ import java.sql.*;
 
 class jdbcPostgres {
 
-    //  Database settings
-//    private  String DB_DRIVER;
-//    private  String DB_ROOT_URL;
-//    private  String DB_DEV;
-//    private  String DB_URL;
-//    private  String LOGIN;
-//    private  String PASSWORD;
-
-    private static String DB_DRIVER;
-    private static String DB_ROOT_URL = Configuration.get("db_root_url");
-    private static String DB_DEV = Configuration.get("db_dev");
+    private static String DB_DRIVER = "org.postgresql.Driver";
+    private static String DB_ROOT_URL = "jdbc:postgresql://127.0.0.1:5432/";
+    private static String DB_DEV = "test_igor";
     private static String DB_URL = DB_ROOT_URL + DB_DEV;
-    private static String LOGIN = Configuration.get("login");
-    private static String PASSWORD = Configuration.get("password");
 
-    // Old not used, but good worked
-//    DB_DRIVER = "org.postgresql.Driver";
-//    DB_ROOT_URL = "jdbc:postgresql://127.0.0.1:5432/";
-//    DB_DEV = "test_igor";
-//    DB_URL = DB_ROOT_URL + DB_DEV;
-//
-//    LOGIN = "postgres";
-//    PASSWORD = "postgres";
+    private static String LOGIN = "postgres";
+    private static String PASSWORD = "postgres";
 
 
     private static Connection connection;
@@ -34,7 +18,6 @@ class jdbcPostgres {
 
     jdbcPostgres() {
         try {
-            DB_DRIVER = Configuration.get("db_driver");
             Class.forName(DB_DRIVER);
             connection = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
             statement = connection.createStatement();

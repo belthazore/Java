@@ -1,0 +1,409 @@
+
+<!-- saved from url=(0031)http://localhost:8080/project/n -->
+<html>
+<head>
+    <meta http-equiv="Content-Typecontent="text/html; charset=UTF-8">
+    <title>Java Tomcat test server | Login</title>
+    <style type="text/css">
+
+.login-page {
+  width: 1200px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.title {
+  font-size: x-large;
+}
+.block {
+  display: block;
+  /*position: relative;*/
+  z-index: 1;
+  background: #FFFFFF;
+  width: 1200px;
+  margin: 0 auto 70px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 0 20px 20px rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.form {
+  display: block;
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  width: 1200px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 0 20px 20px rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+.form input {
+  font-family: inherit;
+  /*font-size: 17px;*/
+
+  font-size: medium;
+  font-weight: normal;
+  font-style: normal;
+  font-variant: normal;
+
+  color: currentColor;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #4CAF50;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.form button:hover, .form button:active, .form button:focus {
+  background: #43A047;
+}
+.form button_mini {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #4CAF50;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #FFFFFF;
+  font-size: 13px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+.form button_mini:hover,.form button_mini:active,.form button_mini:focus {
+  background: #43A047;
+}
+.form .message {
+  margin: 15px 0 0;
+  color: #b3b3b3;
+  font-size: 12px;
+}
+.form .message a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+.form .register-form {
+  display: none;
+}
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.container:before, .container:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.container .info {
+  margin: 50px auto;
+  text-align: center;
+}
+.container .info h1 {
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 36px;
+  font-weight: 300;
+  color: #1a1a1a;
+}
+.container .info span {
+  color: #4d4d4d;
+  font-size: 12px;
+}
+.container .info span a {
+  color: #000000;
+  text-decoration: none;
+}
+.container .info span .fa {
+  color: #EF3B3A;
+}
+table {
+	white-space: normal;
+	line-height: normal;
+	width: normal;
+	font-weight: normal;
+	font-size: medium;
+	font-style: normal;
+	color: -internal-quirk-inherit;
+	font-variant: normal;
+}
+table tbody {
+  text-align: center;
+}
+table th {
+  background-color: #dce6dd;
+}
+table td {
+  padding: 2 2 2 2;
+}
+input[type=button1] {
+  width: 100;
+  height: 78;
+}
+input[class=button2] {
+  width: 100%;
+  height: 78;
+}
+textarea {
+  height: 50;
+}
+input {
+  width: 100%;
+  height: 50;
+  font-size: medium;
+  font-weight: normal;
+  font-style: normal;
+  font-variant: normal;
+  text-align: center;
+  box-sizing: auto;
+  /*width: auto;*/
+  /*word-spacing: normal;*/
+}
+body {
+  background: linear-gradient(to right, #7EC27F, #004C6F); /* fallback for old browsers */
+  /*background: -moz-linear-gradient(right, #76b852, #8DC26F);*/
+  /*background: -webkit-linear-gradient(right, #76b852, #8DC26F);
+  background: -o-linear-gradient(right, #76b852, #8DC26F);
+  background: linear-gradient(to left, #76b852, #8DC26F);*/
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*ul {
+  display: block;
+  position: fixed;
+  list-style-type: none;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  width: 70px;
+}*/
+ul.horizontal {
+	position: fixed;
+	list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+ul.horizontal li {
+    float: left;
+}
+ul.horizontal li a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+ul.horizontal li a.active {
+    background-color: #4CAF50;
+}
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+li a {
+    display: block;
+}
+li a:active {
+    color: #4CAF50;
+}
+li a:hover {
+    background-color: #4CAF50;
+}
+li:last-child {
+  border-right: none;
+}
+			</style>
+</head>
+
+<body>
+
+<div>
+    <ul class="horizontal">
+        <li><a href="#home"  >Главная</a></li>
+        <li><a href="#change">Изменить</a></li>
+        <li><a href="#search">Поиск   </a></li>
+        <li style="float: right;"><a href="#">Выйти</a></li>
+
+        <!-- 		  <li style="float:right"><a class="active" href="#about">О Нас</a></li> -->
+    </ul>
+</div>
+
+<br><br><br>
+<div class="block">
+    <a name="home">
+        <b class="title">Мои заказы</b>
+        <br><br><br>
+        <table width="100%" border="1" cellpadding="4">
+            <tbody>
+            <tr>
+                <th>№</th>
+                <th>Телефон</th>
+                <th>Создан</th>
+                <th>Отдать</th>
+                <th>Тело заказа</th>
+                <th>Коментарий</th>
+                <th>Статус</th>
+                <th align="right">Дейс</th>
+                <th align="left">твие</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>0672112508</td>
+                <td>5.12</td>
+                <td>10.12</td>
+                <td align="left">Зефир манго-5, Капкейки-14, макаронс-8</td>
+                <td align="left">на 07:30 бля, муж снова будет ругаться</td>
+                <td>Создан</td>
+                <td align="center"><input style="width: 98; height: 27;" onclick="location.href=/project/n" value="Изменить" type="button"></td>
+                <td align="center"><input style="width: 98; height: 27;" onclick="location.href=/project/n" value="Выполнить" type="button"></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>0672112508</td>
+                <td>1.11</td>
+                <td>1.12</td>
+                <td align="left">Зефир-5, макаронс-25</td>
+                <td align="left">Коментарий опять</td>
+                <td>Создан</td>
+                <td align="center"><input style="width: 98; height: 27;" onclick="location.href=/project/n" value="Изменить" type="button"></td>
+                <td align="center"><input style="width: 98; height: 27;" onclick="location.href=/project/n" value="Выполнить" type="button"></td>
+            </tr>
+            </tbody>
+        </table>
+        <br><br><br>
+</div>
+
+
+<div class="block">
+    <a name="search">
+        <b class="title">Поиск</b>
+        <br><br><br>
+        <table width="1200" border="1" cellpadding="4">
+            <tbody>
+            <tr>
+                <th>№ Заказа</th>
+                <th>Телефон</th>
+                <th>Создан</th>
+                <th>Отдать</th>
+                <th>Коментарий</th>
+                <th>Статус</th>
+                <td align="center" rowspan="2"><input onclick="location.href=/project/n" value="Найти" type="button" class="button1"></td>
+                <!-- <td align="center" rowspan="2"><a href="http://localhost:8080/project/n#">Найти</a></td> -->
+            </tr>
+            <tr style="height: 50px;">
+                <td><input type="text" name="id" 		 value="1">			 </td>
+                <td><input type="text" name="phone" 	 value="0672112508"> </td>
+                <td><input type="text" name="start_date" value="5.12">		 </td>
+                <td><input type="text" name="end_date" 	 value="15.12">		 </td>
+                <td><input type="text" name="comment" 	 value="comment">	 </td>
+                <td><input type="text" name="status" 	 value="">			 </td>
+            </tr>
+            </tbody>
+        </table>
+</div>
+
+
+
+<div class="block">
+    <a name="change"/>
+    <b class="title">Изменение</b>
+    <br><br><br>
+    <table width="100%" border="1" cellpadding="4">
+        <tbody>
+        <tr>
+            <th>№</th>
+            <th>Телефон</th>
+            <th>Создан</th>
+            <th>Отдать</th>
+            <th>Тело заказа</th>
+            <th>Коментарий</th>
+            <th>Статус</th>
+            <td align="center" rowspan="2"><input onclick="location.href=/project/n" value="Сохранить" type="button" class="button2"></td>
+        </tr>
+        <tr>
+            <td><input type="text" name="id" 		 value="1">			 </td>
+            <td><input type="text" name="phone" 	 value="0672112508"> </td>
+            <td><input type="text" name="start_date" value="5.12">		 </td>
+            <td><input type="text" name="end_date" 	 value="15.12">		 </td>
+            <td><textarea type="text" name="body" 	 value="Зефир манго-5, Капкейки-14, макаронс-8" align="left"></textarea></td>
+            <td><textarea type="text" name="comment" value="Коментарий" align="left"></textarea></td>
+            <td><input type="text" name="status" 	 value="Создан">			 </td>
+
+            <!-- 					<td align="center"><a href="http://localhost:8080/project/n#">Изменить</a></td>
+                                <td align="center"><a href="http://localhost:8080/project/n#">Выполнить</a></td> -->
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!--  	<div class="block">
+		<div display="inline-block" float="none">
+	        <a name="create_form"/>
+	        <b style="font-size: 14">Добавить заказ</b>
+	        <br><br><br>
+	        <form action="#create_form" style="width: auto; margin: auto; display: inline-block;">
+		        <input type="text" name="phone" value="" style="width: 100">
+		        Дата конца <input type="text" name="product" value="">
+		        Тело заказа <input type="text" name="order_content" value="">
+		        Коментарий <input type="text" name="comment" value="">
+	        	<br>
+	        	<input type="submit" style="border-radius: 3px;" value="Добавить">
+	        	<br><br>
+	        </form>
+		</div>
+	</div> -->
+
+<!-- 	<div class="block">
+		<b class="title">2 Добавить заказ 2</b>
+		<br><br><br>
+		<a name="create_form2"/>
+		<form action="#create_form2" style="width: 100%; margin: auto; display: inline-block;">
+			<table width="100%" border="0.5" cellpadding="4">
+	     		<tbody>
+	     			<tr>
+					    <th>Телефон</th>
+					    <th>Имя</th>
+					    <th>На когда</th>
+					    <th>Тело заказа</th>
+					    <th>Коментарий</th>
+					</tr>
+					<tr>
+						<td><input type="text" name="phone" value="0672112508" style="width: 100%; height: 60;"></td>
+						<td><input type="text" name="name"  value="Иннна"      style="width: 100%; height: 60;"></td>
+						<td><input type="text" name="end"   value="7.12" 	   style="width: 100%; height: 60;"></td>
+						<td><textarea type="text" name="order_content" style="width: 100%; height: 60;"></textarea></td>
+						<td><textarea type="text" name="comment" style="width: 100%; height: 60;"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+			<input type="submit" style="border-radius: 3px; width: 150px; height: 30px; margin-top: 20px" value="Добавить">
+		</form>
+	</div> -->
+
+</body>
+</html>
+
+
+
