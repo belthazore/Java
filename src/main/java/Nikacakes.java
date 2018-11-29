@@ -4,6 +4,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -11,6 +14,7 @@ import java.util.*;
 public class Nikacakes extends HttpServlet {
 
     private Map<String, ArrayList<String>> SEARCH_RESULTS = new HashMap<>();
+    private String lastAdded = "";
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -24,21 +28,44 @@ public class Nikacakes extends HttpServlet {
         String action, orderId, product, phoneNumber; // проверенные параметры (!"" | "")
         String actionNeedCheck, orderIdNeedCheck, productNeedCheck, phoneNumberNeedCheck; // параметры для проверки, могут быть == null
 
+        // phone=0672112508
+        // end_date=15.12&
+        // body=&
+        // comment=
+        String  phone,
+                phoneNeedCheck,
 
-        actionNeedCheck = request.getParameter("action");
-        orderIdNeedCheck = request.getParameter("order_id");
+                end_date,
+                end_dateNeedCheck,
 
-        productNeedCheck = request.getParameter("product");
+                body,
+                bodyNeedCheck,
+
+                comment,
+                commentNeedCheck;
+
+        actionNeedCheck      = request.getParameter("action");
+        orderIdNeedCheck     = request.getParameter("order_id");
+        productNeedCheck     = request.getParameter("product");
         phoneNumberNeedCheck = request.getParameter("phone_number");
+
+        phoneNeedCheck = request.getParameter("phone");
+        end_dateNeedCheck = request.getParameter("end_date");
+        bodyNeedCheck = request.getParameter("body");
+        commentNeedCheck = request.getParameter("comment");
 
         // если так не делать, то в кейсе 'action==null' блок
         // 'if ( action!=null & (action.equals("find") | action.equals("create") ){}'
         // дает NullPointerException =(
         action = (actionNeedCheck == null ? "" : actionNeedCheck);
         orderId = (orderIdNeedCheck == null ? "" : orderIdNeedCheck);
-
         product = (productNeedCheck == null ? "" : productNeedCheck);
         phoneNumber = (phoneNumberNeedCheck == null ? "" : phoneNumberNeedCheck);
+
+        phone    = (phoneNeedCheck == null ? "" : phoneNeedCheck);
+        end_date = (end_dateNeedCheck == null ? "" : end_dateNeedCheck);
+        body     = (bodyNeedCheck == null ? "" : bodyNeedCheck);
+        comment  = (commentNeedCheck == null ? "" : commentNeedCheck);
 
 
         // Операция выхода из кабинета
@@ -51,11 +78,28 @@ public class Nikacakes extends HttpServlet {
             return;
         }
 
+        if(action.equals("add")){
+            // phone=0672112008
+            // end_date=15.12&
+            // body=&
+            // comment=
+            System.out.println("action: "+action);
+            if(!phone.equals("") && !end_date.equals("") && !body.equals("") && !comment.equals("")){
+                String current = phone+end_date+body+comment;
+                if (!current.equals(lastAdded)){
+                    doAction(action, new String[]{end_date, body, comment, phone});
+                    lastAdded = current;
+                }
+                // Повторная операция ничего не деалем
+            }
+
+        }
+
 
 //        Cookies.updateSavingTimeIfNeed(request);
 
         // Запишем успешную авторизацию
-        Log.transition("Home. Logined with cookie success", request);
+        Log.transition("Nikacakes. Logined with cookie success", request);
 
 
         StringBuilder PAGE = new StringBuilder();
@@ -83,7 +127,7 @@ public class Nikacakes extends HttpServlet {
         }
 
 
-        String body =
+        String Body =
                 "<body>" +
 
                         "<div>" +
@@ -129,27 +173,24 @@ public class Nikacakes extends HttpServlet {
                         "    <br><br><br>" +
                         "    <table width=\"100%\" border=\"1\" cellpadding=\"4\">" +
                         "        <tbody>" +
+                        "        <form action=\"#add\">" +
                         "        <tr>" +
-                        "            <th>№</th>" +
                         "            <th>Телефон</th>" +
-                        "            <th>Создан</th>" +
                         "            <th>Отдать</th>" +
                         "            <th>Тело заказа</th>" +
                         "            <th>Коментарий</th>" +
-                        "            <th>Статус</th>" +
-                        "            <td align=\"center\" rowspan=\"2\"><input onclick=\"location.href=/project/n\" value=\"Добавить\" type=\"button\" class=\"button2\"></td>" +
+                        "            <td align=\"center\" rowspan=\"2\"><button type=\"submit\" class=\"button1\">Добавить</button></td>" +
                         "        </tr>" +
                         "        <tr>" +
-                        "            <td><input type=\"text\" name=\"id\" 		 value=\"1\">			 </td>" +
-                        "            <td><input type=\"text\" name=\"phone\" 	 value=\"0672112508\"> </td>" +
-                        "            <td><input type=\"text\" name=\"start_date\" value=\"5.12\">		 </td>" +
-                        "            <td><input type=\"text\" name=\"end_date\" 	 value=\"15.12\">		 </td>" +
-                        "            <td><textarea type=\"text\" name=\"body\" 	 value=\"Зефир манго-5, Капкейки-14, макаронс-8\" align=\"left\"></textarea></td>" +
-                        "            <td><textarea type=\"text\" name=\"comment\" value=\"Коментарий\" align=\"left\"></textarea></td>" +
-                        "            <td><input type=\"text\" name=\"status\" 	 value=\"Создан\">			 </td>" +
+                        "            <td><input type=\"text\" name=\"phone\" 	  placeholder=\"0671234567\"></td>" +
+                        "            <td><input type=\"text\" name=\"end_date\"   placeholder=\"31.12\"></td>" +
+                        "            <td><textarea type=\"text\" name=\"body\" 	  placeholder=\"Зефир манго-6, Капкейки-14\" align=\"left\"></textarea></td>" +
+                        "            <td><textarea type=\"text\" name=\"comment\" placeholder=\"Очень хорошая клиентка\" align=\"left\"></textarea></td>" +
+                        "            <input name=\"action\" value=\"add\" type=\"hidden\">" +
                         "" +
-                        "        </tr>" +
-                        "        </tbody>" +
+                        "          </tr>" +
+                        "         </tbody>" +
+                        "        </form>" +
                         "    </table>" +
                         "</div>" +
                         "" +
@@ -217,23 +258,11 @@ public class Nikacakes extends HttpServlet {
                         "    </table>" +
                         "</div>" +
                         "</body>";
-        PAGE.append(head + body);
+        PAGE.append(head + Body);
         response.getWriter().println(PAGE);
     }
 
 
-    String s = // todo: remove me
-            "            <tr>" +
-                    "                <td>1</td>" +
-                    "                <td>0672112508</td>" +
-                    "                <td>5.12</td>" +
-                    "                <td>10.12</td>" +
-                    "                <td align=\"left\">Зефир манго-5, Капкейки-14, макаронс-8</td>" +
-                    "                <td align=\"left\">на 07:30 бля, муж снова будет ругаться</td>" +
-                    "                <td>Создан</td>" +
-                    "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Изменить\" type=\"button\"></td>" +
-                    "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Выполнить\" type=\"button\"></td>" +
-                    "            </tr>";
 
     // Табличная строка из массива
     // Example:
@@ -273,52 +302,64 @@ public class Nikacakes extends HttpServlet {
             psql = new jdbcPostgres();
             switch (action) {
                 case "findAllCreated":
-                    ResultSet rs0 = psql.executeSelect("SELECT * FROM orders WHERE status = 'Создан'"); //todo inejction
-                    while (rs0.next()) {
-                        String rowArr[] = new String[7];
+                    ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE status = 'Создан'"); //todo inejction
+                    while (rs.next()) {
+                        String row[] = new String[7];
                         // id, phone, start_date, end_date, order_content, comment, status
-                        rowArr[0] = String.valueOf(rs0.getInt("id"));
-                        rowArr[1] = rs0.getString("phone");
-                        Date start = new Date(rs0.getLong("start_date") * 1000); // Создание даты как "new Date();"
-                        Date end = new Date(rs0.getLong("end_date") * 1000); // Создание даты как "new Date();"
-                        rowArr[2] = new SimpleDateFormat("dd.MM").format(start);
-                        rowArr[3] = new SimpleDateFormat("dd.MM").format(end);
-                        rowArr[4] = rs0.getString("order_content");
-                        rowArr[5] = rs0.getString("comment");
-                        rowArr[6] = rs0.getString("status");
-                        result.append(getTableRowFromArray(rowArr, "All"));
+                        row[0] = String.valueOf(rs.getInt("id"));
+                        row[1] = rs.getString("phone");
+
+                        Timestamp start = rs.getTimestamp("start_date"); // Создание даты как "new Date();"
+                        Timestamp end   = rs.getTimestamp("end_date"); // Создание даты как "new Date();"
+                        SimpleDateFormat parseDDmm = new SimpleDateFormat("dd.MM");
+                        row[2] = parseDDmm.format(start);
+                        row[3] = parseDDmm.format(end);
+
+                        row[4] = rs.getString("order_content");
+                        row[5] = rs.getString("comment");
+                        row[6] = rs.getString("status");
+                        result.append(getTableRowFromArray(row, "All"));
                     }
                     break;
                 case "find":
-                    ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'"); //todo inejction
-                    rs.next();
+                    ResultSet rs2 = psql.executeSelect("SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'"); //todo inejction
+                    rs2.next();
                     String row[] = new String[7];
                     // id, phone, start_date, end_date, order_content, comment, status
-                    row[0] = String.valueOf(rs.getInt("id"));
-                    row[1] = rs.getString("phone");
-                    Date start = new Date(rs.getLong("start_date") * 1000); // Создание даты как "new Date();"
-                    Date end = new Date(rs.getLong("end_date") * 1000); // Создание даты как "new Date();"
-                    row[2] = new SimpleDateFormat("dd.MM").format(start);
-                    row[3] = new SimpleDateFormat("dd.MM").format(end);
-                    row[4] = rs.getString("order_content");
-                    row[5] = rs.getString("comment");
-                    row[6] = rs.getString("status");
+                    row[0] = String.valueOf(rs2.getInt("id"));
+                    row[1] = rs2.getString("phone");
+
+                    Timestamp start = rs2.getTimestamp("start_date"); // Создание даты как "new Date();"
+                    Timestamp end   = rs2.getTimestamp("end_date"); // Создание даты как "new Date();"
+                    SimpleDateFormat parseDDmm = new SimpleDateFormat("dd.MM");
+                    row[2] = parseDDmm.format(start);
+                    row[3] = parseDDmm.format(end);
+
+                    row[4] = rs2.getString("order_content");
+                    row[5] = rs2.getString("comment");
+                    row[6] = rs2.getString("status");
                     result = new StringBuilder(getTableRowFromArray(row, "All"));
                     break;
                 case "add":
-                    String QueryInsert =
-                            "INSERT INTO orders" +
-                                    "  (order_id, product, client_phone)" +
-                                    "VALUES" +
-                                    "  (nextval('orders_order_id_seq'), '" + params[0] + "', '" + params[1] + "')"; // RUTRNUNG
-                    psql.executeSelect(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
-                    ResultSet rs2 = psql.executeSelect("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
-                    rs2.next();
-                    result = new StringBuilder(rs2.getString(1) + " | " + params[0] + " | " + params[1]);
-                    String query = "" +
-                    "INSERT INTO orders(phone, start_date, end_date, order_content, comment, status)" +
-                        "VALUES" +
-                            "('0672112008', 1542059302829, 1542059402829, 'Зефир-5, макаронс-25', 'Коментарий опять', 'Создан')";
+                    // doAction("add", new String[]{"3.12", "bodyOrder", "comment", "0671234567"})
+                    /** Параметры для инсерта берем из params[]
+                    * params[0] = "3.12" Заказ на 3 декабря
+                    * params[1] = "bodyOrder"
+                    * params[2] = "Comment"
+                    * params[3] = "0671234567" todo на 1
+                    */
+                    assert params[0]!=null;
+                    String tsNow = new Timestamp(new Date().getTime()).toString(),
+                           tsTo  = parseTimestamp(params[0]).toString();
+                    String QUERY = "INSERT INTO orders(phone, start_date, end_date, order_content, comment, status)" +
+                            "VALUES ('"+params[3]+"', '"+tsNow+"', '"+tsTo+"', '"+params[1]+"', '"+params[2]+"', 'Создан')";
+
+                    String query = "INSERT INTO orders(phone, start_date, end_date, order_content, comment, status)" +
+                            "VALUES (?, ?, ?, ?, ?, 'Создан')";
+                    String[] arrParamForQuery = new String[]{params[3], tsNow, tsTo, params[1], params[2]}; // todo на 1
+
+//                    jdbcPostgres.execute(query, arrParamForQuery);
+                    psql.executeSelect(QUERY);
                     break;
                 default:
                 throw new Exception("Wrong action");
@@ -332,6 +373,27 @@ public class Nikacakes extends HttpServlet {
         return result.toString();
     }
 
+    // 29.11
+    // Приклеем 2018 и сконвЕртим в TS
+    private static Timestamp parseTimestamp(String dayMonth){
+//        String myDateIn = "1.1";
+        Timestamp timestamp = null;
+        Date date = null;
+        if(!dayMonth.equals("")) {
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            try {
+                date = dateFormat.parse(dayMonth + ".2018");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            long time = 0;
+            if (date != null) {
+                time = date.getTime();
+            }
+            timestamp = new Timestamp(time);
+        }
+        return timestamp;
+    }
     // TODO: решить проблему добавления через "link rel"
     private String getStyle() {
         return

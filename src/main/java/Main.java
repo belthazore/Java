@@ -8,6 +8,7 @@ import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -337,8 +338,8 @@ public class Main {
             if (psql == null) err.println("psql: " + psql);
 
             ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE id='1'");
-            rs.next();
-            out.println(rs.getInt("id"));
+            if(rs.next())
+                out.println(rs.getInt("id"));
             for (int i = 1; i < rs.getMetaData().getColumnCount(); i++) {
                 String
                         label = rs.getMetaData().getColumnLabel(i),
@@ -349,15 +350,27 @@ public class Main {
             out.println(rs.getMetaData().getColumnName(1));
 
 
+
+            out.println("\n\n--------------- day/month convert to Timestamp ---------------");
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             String myDateIn = "1.1";
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
             Date date = dateFormat.parse(myDateIn + ".2018");
             long time = date.getTime();
             Timestamp ts = new Timestamp(time);
-            String QUERY = "INSERT INTO person_test(id, time) VALUES (" + 3  + ", '"+ ts + "')";
+
+
+            Timestamp tsNow = new Timestamp(new Date().getTime()),
+                      tsTo = parseTimestamp("3.1");
+            String bodyOrder = "bodyOrder",
+                   comment = "Comment";
+
+            String QUERY = "INSERT INTO orders(phone, start_date, end_date, order_content, comment, status)" +
+                            "VALUES ('0676312031', '"+tsNow+"', '"+tsTo+"', '"+bodyOrder+"', '"+comment+"', 'Создан')";
+
             jdbcPostgres.execute(QUERY, new String[]{});
 
-            out.println(ts);
+            out.println(parseTimestamp("3.1"));
 
 
         } catch (Exception e) {
@@ -567,19 +580,48 @@ public class Main {
         }
     }
 
-    public static String doAction(String action, String[] params) {
+
+    String s = // todo: remove me
+            "            <tr>" +
+                    "                <td>1</td>" +
+                    "                <td>0672112508</td>" +
+                    "                <td>5.12</td>" +
+                    "                <td>10.12</td>" +
+                    "                <td align=\"left\">Зефир манго-5, Капкейки-14, макаронс-8</td>" +
+                    "                <td align=\"left\">на 07:30 бля, муж снова будет ругаться</td>" +
+                    "                <td>Создан</td>" +
+                    "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Изменить\" type=\"button\"></td>" +
+                    "                <td align=\"center\"><input style=\"width: 98; height: 27;\" onclick=\"location.href=/project/n\" value=\"Выполнить\" type=\"button\"></td>" +
+                    "            </tr>";
+
+    private String doAction(String action, String[] params) {
         // params[] в зависимости от action
         // find:   ["1"]
         // create: ["Merenga: 10 pcs", "0671234567"]
-        String result = null;
+        StringBuilder result = new StringBuilder();
         jdbcPostgres psql = null;
         try {
             psql = new jdbcPostgres();
-
             switch (action) {
+                case "findAllCreated":
+                    ResultSet rs0 = psql.executeSelect("SELECT * FROM orders WHERE status = 'Создан'"); //todo inejction
+                    while (rs0.next()) {
+                        String rowArr[] = new String[7];
+                        // id, phone, start_date, end_date, order_content, comment, status
+                        rowArr[0] = String.valueOf(rs0.getInt("id"));
+                        rowArr[1] = rs0.getString("phone");
+                        Date start = new Date(rs0.getLong("start_date") * 1000); // Создание даты как "new Date();"
+                        Date end = new Date(rs0.getLong("end_date") * 1000); // Создание даты как "new Date();"
+                        rowArr[2] = new SimpleDateFormat("dd.MM").format(start);
+                        rowArr[3] = new SimpleDateFormat("dd.MM").format(end);
+                        rowArr[4] = rs0.getString("order_content");
+                        rowArr[5] = rs0.getString("comment");
+                        rowArr[6] = rs0.getString("status");
+//                        result.append(getTableRowFromArray(rowArr, "All"));
+                    }
+                    break;
                 case "find":
-                    String query = "SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'";
-                    ResultSet rs = psql.executeSelect(query); //todo inejction
+                    ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'"); //todo inejction
                     rs.next();
                     String row[] = new String[7];
                     // id, phone, start_date, end_date, order_content, comment, status
@@ -587,14 +629,14 @@ public class Main {
                     row[1] = rs.getString("phone");
                     Date start = new Date(rs.getLong("start_date") * 1000); // Создание даты как "new Date();"
                     Date end = new Date(rs.getLong("end_date") * 1000); // Создание даты как "new Date();"
-                    row[2] = new SimpleDateFormat("dd/MM HH:mm").format(start);
-                    row[3] = new SimpleDateFormat("dd/MM HH:mm").format(end);
+                    row[2] = new SimpleDateFormat("dd.MM").format(start);
+                    row[3] = new SimpleDateFormat("dd.MM").format(end);
                     row[4] = rs.getString("order_content");
                     row[5] = rs.getString("comment");
                     row[6] = rs.getString("status");
-                    result = getTableRowFromArray(row);
+//                    result = new StringBuilder(getTableRowFromArray(row, "All"));
                     break;
-                case "create":
+                case "add":
                     String QueryInsert =
                             "INSERT INTO orders" +
                                     "  (order_id, product, client_phone)" +
@@ -603,7 +645,11 @@ public class Main {
                     psql.executeSelect(QueryInsert); // добавим новую запись. Всегда true, т.к. order_id всегда уникален
                     ResultSet rs2 = psql.executeSelect("SELECT last_value FROM orders_order_id_seq"); // получим последний order_id
                     rs2.next();
-                    result = rs2.getString(1) + " | " + params[0] + " | " + params[1];
+                    result = new StringBuilder(rs2.getString(1) + " | " + params[0] + " | " + params[1]);
+                    String query = "" +
+                            "INSERT INTO orders(phone, start_date, end_date, order_content, comment, status)" +
+                            "VALUES" +
+                            "('0672112008', 1542059302829, 1542059402829, 'Зефир-5, макаронс-25', 'Коментарий опять', 'Создан')";
                     break;
                 default:
                     throw new Exception("Wrong action");
@@ -614,7 +660,7 @@ public class Main {
             if (psql != null)
                 psql.closeConnection();
         }
-        return result;
+        return result.toString();
     }
 
 
@@ -629,6 +675,22 @@ public class Main {
         sb.append("<td><button_mini type=\"submit\" style=\"border-radius: 3px;\">Выполнен</button_mini></td>");
         sb.append("</tr>");
         return sb.toString();
+    }
+
+    // 29.11
+    // Приклеем 2018 и сконвЕртим в TS
+    static Timestamp parseTimestamp(String dayMonth){
+//        String myDateIn = "1.1";
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        Date date = null;
+        try {
+            date = dateFormat.parse(dayMonth + ".2018");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long time = date.getTime();
+        Timestamp timestamp = new Timestamp(time);
+        return timestamp;
     }
 
 
