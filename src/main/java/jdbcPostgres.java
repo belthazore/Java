@@ -10,6 +10,7 @@ class jdbcPostgres {
 
     private static String LOGIN = "postgres";
     private static String PASSWORD = "postgres";
+    private static boolean LOGGING = false;
 
 
     private static Connection connection;
@@ -58,7 +59,7 @@ class jdbcPostgres {
             }
             prepStatement.execute();
         } catch (SQLException | ClassNotFoundException e) {
-            Log.error(e.getMessage() + "Query: " + QUERY);
+            if(LOGGING) Log.error(e.getMessage() + "Query: " + QUERY);
             e.printStackTrace();
         } finally {
             if (conn != null)

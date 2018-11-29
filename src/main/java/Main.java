@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,11 +21,13 @@ import static java.lang.Thread.sleep;
 
 public class Main {
 
-    private static Map<String, Long> hmCookieTime =
-            Collections.synchronizedMap(new HashMap<>());
-
+    private static Map<String, Long> hmCookieTime = Collections.synchronizedMap(new HashMap<>());
     private static ConcurrentHashMap<String, Long> hm;
+    private static jdbcPostgres psql;
 
+    static {
+        psql = new jdbcPostgres();
+    }
 
     public static void main(String[] args) {
         try {
@@ -131,7 +134,6 @@ public class Main {
 //            psql.execute3("DELETE FROM cooks WHERE cookie='$0'", new String[]{"cook2"}); // Не пашет :(
 
 
-
             out.println("\n-- Thread example --");
 
 //            TenMinutesRunnable tmt = new TenMinutesRunnable();
@@ -154,7 +156,7 @@ public class Main {
             Date dateNow = new Date();
             out.println(dateNow.getTime());
             long l = 1542059563804L;
-            Date d2 = new Date(l*1000);
+            Date d2 = new Date(l * 1000);
             out.println(d2);
             out.println(new SimpleDateFormat("dd-MM-yyyy").format(dateNow));
             out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(dateNow));
@@ -303,7 +305,6 @@ public class Main {
             out.println(timeNow);
 
 
-
             out.println("\n\n--------------- DIR LS Example ---------------");
 
             System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -317,7 +318,7 @@ public class Main {
             long unixNow, unixNowPlus7Day, unix7Days;
 
             unixNow = new Date().getTime();
-            unix7Days = TimeUnit.HOURS.toMillis(24*7);
+            unix7Days = TimeUnit.HOURS.toMillis(24 * 7);
             unixNowPlus7Day = unixNow + unix7Days;
 
             out.println(System.currentTimeMillis());
@@ -331,27 +332,38 @@ public class Main {
 //            out.println(response);
 
 
+            jdbcPostgres.execute("SELECT * FROM orders", new String[]{}); // Ничего не вернет, работает только для INSERT
 
-            jdbcPostgres.execute("SELECT * FROM orders", new String[]{});
+            if (psql == null) err.println("psql: " + psql);
 
-            String result = null;
-            jdbcPostgres psql = new jdbcPostgres();
-            String query = "SELECT * FROM orders WHERE id='1'";
-            ResultSet rs = psql.executeSelect(query);
+            ResultSet rs = psql.executeSelect("SELECT * FROM orders WHERE id='1'");
             rs.next();
             out.println(rs.getInt("id"));
+            for (int i = 1; i < rs.getMetaData().getColumnCount(); i++) {
+                String
+                        label = rs.getMetaData().getColumnLabel(i),
+                        name = rs.getMetaData().getColumnName(i);
+                out.println("label: " + label); // то же что
+                out.println("name: " + name); //  и "name"
+            }
+            out.println(rs.getMetaData().getColumnName(1));
 
-            out.println(Timestamp.valueOf(String.valueOf(System.currentTimeMillis())));
 
+            String myDateIn = "1.1";
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            Date date = dateFormat.parse(myDateIn + ".2018");
+            long time = date.getTime();
+            Timestamp ts = new Timestamp(time);
+            String QUERY = "INSERT INTO person_test(id, time) VALUES (" + 3  + ", '"+ ts + "')";
+            jdbcPostgres.execute(QUERY, new String[]{});
 
-
-
-
-
+            out.println(ts);
 
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            psql.closeConnection();
         }
     }
 
@@ -380,7 +392,6 @@ public class Main {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
 
 
     static class AutoCleanCooksThread2 extends Thread {
@@ -417,12 +428,16 @@ public class Main {
                         }
                     }
 
-                } catch (Exception e) { e.printStackTrace(); }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 try {
                     out.println("I`m sleeping...");
                     Thread.sleep(60000 * COOKIE_LIFETIME_MIN);
-                } catch (InterruptedException e) { e.printStackTrace(); }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 out.println("AFTER: " + hm.keySet());
             }
@@ -430,79 +445,78 @@ public class Main {
     }
 
 
-
-// Класс-поток, можно указать интервал и число запусков
+    // Класс-поток, можно указать интервал и число запусков
 // Запуск:
 // MyThread mt = new MyThread();
 // Thread t = new Thread(mt);
 // mt.is
-static class MyThread implements Runnable {
-    long counterGlobal = 0; //общий счетчик итераций
-    int limit;
-    long sleepTimeMS;
-    boolean isInfinity = false;
+    static class MyThread implements Runnable {
+        long counterGlobal = 0; //общий счетчик итераций
+        int limit;
+        long sleepTimeMS;
+        boolean isInfinity = false;
 
 
-    //бесконечное выполнение
-    MyThread(long sleepTimeMilliseconds) {
-        this.sleepTimeMS = sleepTimeMilliseconds;
-        this.isInfinity = true;
-    }
+        //бесконечное выполнение
+        MyThread(long sleepTimeMilliseconds) {
+            this.sleepTimeMS = sleepTimeMilliseconds;
+            this.isInfinity = true;
+        }
 
-    //выполняется 'limit'-раз
-    MyThread(int limit, int sleepTimeMilliseconds) {
-        this.limit = limit;
-        this.sleepTimeMS = sleepTimeMilliseconds;
-    }
+        //выполняется 'limit'-раз
+        MyThread(int limit, int sleepTimeMilliseconds) {
+            this.limit = limit;
+            this.sleepTimeMS = sleepTimeMilliseconds;
+        }
 
-    public long getCounter() {
-        return counterGlobal;
-    }
+        public long getCounter() {
+            return counterGlobal;
+        }
 
-    public void run() {
-        if (isInfinity) {
-            while (true) {
-                out.println("[infinity thread] ");
-                try {
-                    Thread.sleep(sleepTimeMS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        public void run() {
+            if (isInfinity) {
+                while (true) {
+                    out.println("[infinity thread] ");
+                    try {
+                        Thread.sleep(sleepTimeMS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    counterGlobal++;
+                }
+            } else {
+                int counter = 0;
+                while (counter <= limit) {
+                    out.println(">> " + counter + " <<");
+                    try {
+                        Thread.sleep(sleepTimeMS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    counter++;
                 }
                 counterGlobal++;
             }
-        } else {
-            int counter = 0;
-            while (counter <= limit) {
-                out.println(">> " + counter + " <<");
-                try {
-                    Thread.sleep(sleepTimeMS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                counter++;
-            }
-            counterGlobal++;
+
+        }
+    }
+
+    public enum enumTimeExample {
+
+        MILLISECONDS(1),
+        SECONDS(1000),
+        MINUTES(60000),
+        HOURS(360000);
+        int time;
+
+        enumTimeExample(int time) {
+            this.time = time;
         }
 
+        int get(int factor) {
+            return factor * time;
+        }
     }
-}
-
-public enum enumTimeExample {
-
-    MILLISECONDS(1),
-    SECONDS(1000),
-    MINUTES(60000),
-    HOURS(360000);
-    int time;
-
-    enumTimeExample(int time) {
-        this.time = time;
-    }
-
-    int get(int factor) {
-        return factor * time;
-    }
-}
 
     private static float diffSeconds(long from, long to) {
         return (to - from) / 1000;
@@ -516,42 +530,42 @@ public enum enumTimeExample {
         return System.currentTimeMillis();
     }
 
-static class TenMinutesThread implements Runnable {
-    public void run() {
-        try {
-            while (true) {
-                err.println("3sec >>");
-                try {
-                    sleep(3000); //60000*10 минут 10
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                err.println("3sec <<");
-
-                String[] arr = hmCookieTime.keySet().toArray(new String[0]); //arr become =["key-0","key-N"]
-                out.println(hmCookieTime.keySet());
-                for (String s : arr) {
-                    long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
-                    float diffMinutes = (float) (getTimeNow() - timeSaveCook) / 60000;
-                    //TODO: need realize writing to log
-                    //Удаление если возраст куки более 10ти минут
-                    if (diffMinutes > 10) {
-                        out.println("REMOVING: " + s);
-                        //из HM
-                        hmCookieTime.remove(s);
-                        //из PG
-//                            psql.executeSelect("DELETE FROM cooks WHERE cookie='" + s + "'");
+    static class TenMinutesThread implements Runnable {
+        public void run() {
+            try {
+                while (true) {
+                    err.println("3sec >>");
+                    try {
+                        sleep(3000); //60000*10 минут 10
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
+                    err.println("3sec <<");
+
+                    String[] arr = hmCookieTime.keySet().toArray(new String[0]); //arr become =["key-0","key-N"]
+                    out.println(hmCookieTime.keySet());
+                    for (String s : arr) {
+                        long timeSaveCook = hmCookieTime.get(s); //берем время куки(long) из HM
+                        float diffMinutes = (float) (getTimeNow() - timeSaveCook) / 60000;
+                        //TODO: need realize writing to log
+                        //Удаление если возраст куки более 10ти минут
+                        if (diffMinutes > 10) {
+                            out.println("REMOVING: " + s);
+                            //из HM
+                            hmCookieTime.remove(s);
+                            //из PG
+//                            psql.executeSelect("DELETE FROM cooks WHERE cookie='" + s + "'");
+                        }
+                    }
+                    out.println("\n");
+                    new Main();
                 }
-                out.println("\n");
-                new Main();
-            }
-        } catch (Exception ignored) {
-        } finally {
+            } catch (Exception ignored) {
+            } finally {
 //                psql.closeConnection();
+            }
         }
     }
-}
 
     public static String doAction(String action, String[] params) {
         // params[] в зависимости от action
@@ -567,12 +581,12 @@ static class TenMinutesThread implements Runnable {
                     String query = "SELECT * FROM orders WHERE id='" + Integer.parseInt(params[0]) + "'";
                     ResultSet rs = psql.executeSelect(query); //todo inejction
                     rs.next();
-                    String row[]= new String[7];
+                    String row[] = new String[7];
                     // id, phone, start_date, end_date, order_content, comment, status
                     row[0] = String.valueOf(rs.getInt("id"));
                     row[1] = rs.getString("phone");
-                    Date start = new Date(rs.getLong("start_date")*1000); // Создание даты как "new Date();"
-                    Date end =   new Date(rs.getLong("end_date")  *1000); // Создание даты как "new Date();"
+                    Date start = new Date(rs.getLong("start_date") * 1000); // Создание даты как "new Date();"
+                    Date end = new Date(rs.getLong("end_date") * 1000); // Создание даты как "new Date();"
                     row[2] = new SimpleDateFormat("dd/MM HH:mm").format(start);
                     row[3] = new SimpleDateFormat("dd/MM HH:mm").format(end);
                     row[4] = rs.getString("order_content");
@@ -607,7 +621,7 @@ static class TenMinutesThread implements Runnable {
     private static String getTableRowFromArray(String[] arr) {
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        for(String cursor : arr){
+        for (String cursor : arr) {
             sb.append("<td>");
             sb.append(cursor);
             sb.append("</td>");
